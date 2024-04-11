@@ -22,7 +22,7 @@ GiottoUtils::package_check(
 
 ## ------------------------ EDIT THESE ------------------------- ##
 setwd("[PATH TO Giotto_Suite_manuscript REPO]")
-data_dir <- "[PATH TO MERSCOPE HUMAN BREAST CANCER DATASET]"
+data_dir <- "[PATH TO MERSCOPE HUMAN BREAST CANCER DATASET PATIENT 1]"
 ## ------------------------------------------------------------- ##
 
 source("scripts/SOURCE/vizgen_hdf5.R") # utils for working with H5TileProxy
@@ -64,6 +64,7 @@ nuclei <- "scripts/CREATE/EXT_DATA/viz_mini_DAPI.geojson"
 #              Pre-made H5TileProxy already exists in DATA folder
 
 future::plan(future::multisession)
+options("giotto.logdir" = H5TP_dir)
 
 fovIndexVizgenHDF5(
   poly_dir = poly_dir,
@@ -130,7 +131,7 @@ tx_dt <- data.table::fread(paste0(data_dir, "detected_transcripts.csv"),
   drop = c("x", "y")
 ) # remove local coordinates
 data.table::setnames(tx_dt, old = c("global_x", "global_y"), new = c("x", "y"))
-tx_sub <- H5TPqueryPolys(tx_dt, gimg_list[[1]]@raster_object, crop_ext)
+tx_sub <- ext_query_points(tx_dt, gimg_list[[1]]@raster_object, crop_ext)
 
 # create giotto points
 gpoints_list <- createGiottoPoints(

@@ -17,7 +17,7 @@ GiottoUtils::package_check(
 
 ## ------------------------ EDIT THESE ------------------------- ##
 setwd("[PATH TO Giotto_Suite_manuscript REPO]")
-data_dir <- "[PATH TO MERSCOPE HUMAN BREAST CANCER DATASET]"
+data_dir <- "[PATH TO MERSCOPE MOUSE BRAIN MAP SLICE1 REP1 DATASET]"
 ## ------------------------------------------------------------- ##
 
 source("scripts/SOURCE/vizgen_hdf5.R") # utils for working with H5TileProxy
@@ -46,6 +46,7 @@ dapi <- file.path(img_dir, "datasets_mouse_brain_map_BrainReceptorShowcase_Slice
 #              Pre-made H5TileProxy already exists in DATA folder
 
 future::plan(future::multisession)
+options("giotto.logdir" = H5TP_dir)
 
 fovIndexVizgenHDF5(
   poly_dir = poly_dir,
@@ -71,10 +72,10 @@ dapi_img <- createMerscopeLargeImage(
   image_file = dapi,
   transforms_file = tfs,
   name = "dapi_z0"
-)
+)[[1]]
 
 # Not necessary for making a dataset, but done so that the saved object is smaller
-dapi_crop_img <- crop(dapi_img, crop_ext)
+dapi_z0_crop_img <- crop(dapi_img, crop_ext)
 
 
 
@@ -103,7 +104,7 @@ spatvector_poly_list <- lapply(
   filter_list,
   function(token_filter) {
     mb_vizproxy@filter$V2 <- token_filter
-    H5TPqueryPolys(mb_vizproxy, dapi_full_mb@raster_object, crop_ext)
+    H5TPqueryPolys(mb_vizproxy, dapi_img@raster_object, crop_ext)
   }
 )
 
@@ -118,17 +119,6 @@ names(polys_list) <- paste0("z", 0:6)
 
 
 
-## crop image ####
-# Not necessary for making a dataset, but done so that the saved object is smaller
-dapi_z0_crop <- terra::crop(dapi_full_mb@raster_object, crop_ext)
-dapi_z0_crop_gimg <- createGiottoLargeImage(
-  raster_object = dapi_z0_crop,
-  name = "dapi_z0",
-  use_rast_ext = TRUE
-)
-
-
-
 ## load the transcript detections points data ####
 tx_dt <- data.table::fread(
   file.path(data_dir, "datasets_mouse_brain_map_BrainReceptorShowcase_Slice1_Replicate1_detected_transcripts_S1R1.csv")
@@ -139,7 +129,7 @@ data.table::setnames(tx_dt, c("global_x", "global_y", "global_z"), c("x", "y", "
 
 tx_dt_sub <- ext_query_points(
   xy = tx_dt,
-  SpatRaster = dapi_full_mb,
+  SpatRaster = dapi_img,
   crop_ext = crop_ext
 )
 
@@ -154,7 +144,7 @@ gpoints_list <- createGiottoPoints(
 
 
 # make sure the data is all in the right place ####
-plot(dapi_z0_crop_gimg, col = grDevices::hcl.colors(100, "viridis"))
+plot(dapi_z0_crop_img, col = grDevices::hcl.colors(100, "viridis"))
 plot(polys_list$z0, add = TRUE, col = "cyan", alpha = 0.1)
 plot(sample(gpoints_list$rna@spatVector, 1e4), add = TRUE, cex = 0.3, col = "yellow", alpha = 0.3)
 
@@ -165,7 +155,7 @@ plot(sample(gpoints_list$rna@spatVector, 1e4), add = TRUE, cex = 0.3, col = "yel
 g <- createGiottoObject(
   feat_info = gpoints_list,
   spatial_info = polys_list,
-  largeImages = list(dapi_z0_crop_gimg)
+  largeImages = list(dapi_z0_crop_img)
 )
 
 # calculate centroids for all layers ####

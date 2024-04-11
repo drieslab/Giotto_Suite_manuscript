@@ -208,7 +208,7 @@ get_values_extent = function(h5tp, extent) {
 get_manifest = function(file_list, root = NA_character_, token_names = NULL, fov_tokens = c('file_ID'), verbose = TRUE) {
   if(verbose) {
     s_time = proc.time()
-    message('cataloguing...\n [start] ')
+    GiottoUtils::vmsg(.v = "log", 'cataloguing...\n [start] ')
   }
 
   out = future.apply::future_lapply(
@@ -245,7 +245,7 @@ get_manifest = function(file_list, root = NA_character_, token_names = NULL, fov
   key_names = unique(c('file_ID', 'fov', names(manifest)[names(manifest) != 'fullname']))
   data.table::setkeyv(manifest, key_names)
   if(verbose) {
-    message(' [finish] ', data.table::timetaken(s_time))
+    GiottoUtils::vmsg(.v = "log", ' [finish] ', data.table::timetaken(s_time))
   }
   return(manifest)
 }
@@ -346,7 +346,7 @@ scan_extent_vizgen = function(manifest, file_list,
 
   if(verbose) {
     s_time = proc.time()
-    message('scanning extents...\n [start] ')
+    GiottoUtils::vmsg(.v = "log", 'scanning extents...\n [start] ')
   }
 
   out = future.apply::future_lapply(
@@ -362,9 +362,11 @@ scan_extent_vizgen = function(manifest, file_list,
   fov_ext = do.call(rbind, out)
   fov_ext = data.table::as.data.table(fov_ext)
   data.table::setnames(fov_ext, c('fov', 'xmin', 'xmax', 'ymin', 'ymax'))
+  GiottoUtils::vmsg(.v = "log", ' [finish] ', data.table::timetaken(s_time))
   if(verbose) {
-    message(' [finish] ', data.table::timetaken(s_time))
+    message("[finish]", data.table::timetaken(s_time))
   }
+  
   return(fov_ext)
 }
 
@@ -551,7 +553,7 @@ fovIndexVizgenHDF5 <- function(poly_dir, out_dir) {
                       V2 = 'zIndex_0')
   mb_vizproxy@filter = token_filter
 
-  qs::qsave(mb_vizproxy, file = paste0(out_dir, 'vizH5Proxy.qs'))
+  qs::qsave(mb_vizproxy, file = file.path(out_dir, 'vizH5Proxy.qs'))
 }
 
 
