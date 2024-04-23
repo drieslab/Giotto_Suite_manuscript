@@ -21,6 +21,8 @@ if (!requireNamespace("org.Hs.eg.db", quietly = TRUE)) {
 
 # set working directory to project
 setwd("PATH TO Giotto_Suite_manuscript REPO")
+fig_dir <- file.path("scripts", "FIGURE", "S5")
+dir.create(fig_dir, showWarnings = FALSE)
 
 
 # create dataset from vizgen FFPE breast cancer dataset ####
@@ -31,7 +33,7 @@ setwd("PATH TO Giotto_Suite_manuscript REPO")
 python_path <- NULL
 g = loadGiotto(path_to_folder = 'scripts/CREATE/OUTS/vizgen_ffpe_BC_mini/',
                python_path = python_path)
-instructions(g, 'save_dir') = 'scripts/FIGURE/S5/'
+instructions(g, 'save_dir') = fig_dir
 instructions(g, 'show_plot') = TRUE
 instructions(g, 'return_plot') = FALSE
 instructions(g, 'save_plot') = TRUE
@@ -52,12 +54,16 @@ nuc_poly = getPolygonInfo(g,
 # check data overlaps
 ##### Fig S5 A ---------------------------------------------------------- ####
 # cell segmentations
+svg(file.path(fig_dir, "A.svg"))
 plot(g@largeImages$cellbound3_z0, range = c(0, 24e2))
-terra::lines(cell_poly@spatVector, col = 'red', alpha = 0.3)
+terra::lines(cell_poly@spatVector, col = 'red', alpha = 0.3, lwd = 0.5)
+dev.off()
 ##### Fig S5 B ---------------------------------------------------------- ####
 # nuclear manual segmentations
+svg(file.path(fig_dir, "B.svg"))
 plot(g@largeImages$dapi_z0, range = c(0, 15e3))
-terra::lines(nuc_poly@spatVector, col = 'red', alpha = 0.5)
+terra::lines(nuc_poly@spatVector, col = 'red', alpha = 0.5, lwd = 0.5)
+dev.off()
 
 # giottoPoints assigns each transcript an unique ID (feat_ID_uniq)
 force(gpoints)
@@ -256,15 +262,18 @@ viz_gsea_nuc_cyto_dt = dt_compartment_ranked_lfc(
 
 
 ##### Fig S5 D ---------------------------------------------------------- ####
+svg(file.path(fig_dir, "D.svg"), height = 4, width = 7)
 compartment_lfc_plot(
   x = viz_gsea_inside_outside_dt,
   ylab = "Normalized Expression - Log2FC(Inside/Outside)",
   xlab = 'Gene',
   main = "Log2FC Inside/Outside Cell"
 )
+dev.off()
 
 
 ##### Fig S5 E ---------------------------------------------------------- ####
+svg(file.path(fig_dir, "E.svg"), height = 4, width = 7)
 compartment_lfc_plot(
   viz_gsea_nuc_cyto_dt,
   a = 'nucleus',
@@ -273,6 +282,7 @@ compartment_lfc_plot(
   xlab = 'Gene',
   main = 'Log2FC Nuclear/Cytoplasm'
 )
+dev.off()
 
 
 
@@ -347,13 +357,16 @@ gsea_nuc_cyto = GO(ranked_nuc_cyto)
 
 
 ##### Fig S5 F ---------------------------------------------------------- ####
+svg(file.path(fig_dir, "F.svg"), height = 7, width = 9)
 enrichplot::dotplot(gsea_inside_outside, showCategory = 6, split=".sign") + 
   enrichplot::facet_grid(.~.sign)
+dev.off()
 
 ##### Fig S5 G ---------------------------------------------------------- ####
+svg(file.path(fig_dir, "G.svg"), height = 7, width = 9)
 enrichplot::dotplot(gsea_nuc_cyto, showCategory = 6, split = ".sign") + 
   enrichplot::facet_grid(.~.sign)
-
+dev.off()
 
 
 # Plot enriched GO results ####
@@ -384,18 +397,21 @@ my_cop_genes = ranked_nuc_cyto[ensembl %in% cop_genes, genes]
 
 
 
-##### Fig 2C ---------------------------------------------------------- ####
+##### Fig S5 C ---------------------------------------------------------- ####
+svg(file.path(fig_dir, "C.svg"))
 plot(cell_poly, background = 'black', col = 'darkgreen', alpha = 0.7,)
 plot(gpoints, feats = my_psk_genes, col = 'magenta', add = TRUE, alpha = 1, raster = FALSE)
 plot(gpoints, feats = my_ecmo_genes, col = 'cyan', add = TRUE, alpha = 0.4, raster = FALSE)
 terra::lines(cell_poly@spatVector, col = 'yellow', lwd = 0.8, alpha = 0.7)
+dev.off()
 
-##### Fig S5 C ---------------------------------------------------------- ####
+##### Fig 2C ---------------------------------------------------------- ####
+svg(file.path(fig_dir, "2C.svg"), height = 7, width = 9)
 plot(cell_poly, background = 'black', col = 'darkgreen', alpha = 0.7,)
-plot(gpoints, feats = my_rnal_genes, col = 'magenta', add = TRUE, alpha = 1, raster = FALSE, cex = 0.2)
+plot(gpoints, feats = my_rnal_genes, col = 'magenta', add = TRUE, alpha = 1, raster = FALSE, cex = 0.5)
 plot(gpoints, feats = my_cop_genes, col = 'cyan', add = TRUE, alpha = 0.5, raster = FALSE)
 terra::lines(nuc_poly@spatVector, col = 'yellow', lwd = 0.8, alpha = 0.5)
-
+dev.off()
 
 
 
