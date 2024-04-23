@@ -130,7 +130,7 @@ h100_M <- overlapToMatrix(
 # 
 # We also load the values from disk here and remake other elements here in order 
 # to make resuming of the script easier since the previous step can take a while.
-e <- ext(0, 26948, 0, 16250) # extent of s from earlier
+e <- ext(2826, 29774, 2975, 19225) # extent of s from earlier
 
 h400_M_path <- file.path(outs_dir, 'hex400_rna_raw_matrix.h5')
 h100_M_path <- file.path(outs_dir, 'hex100_rna_raw_matrix.h5')
@@ -174,7 +174,7 @@ instructions(g, 'return_plot') <- FALSE
 g <- addCellStatistics(g, spat_unit = "hex400", expression_values = 'raw')
 g <- addCellStatistics(g, spat_unit = "hex100", expression_values = 'raw')
 
-# FIGURE S12 A ----------------------------------------------------------- ####
+# FIGURE S12 A1 --------------------------------------------------------- ####
 spatInSituPlotPoints(
   g, polygon_feat_type = 'hex400',
   polygon_fill = 'total_expr',
@@ -182,10 +182,12 @@ spatInSituPlotPoints(
   polygon_line_size = 0, 
   polygon_fill_gradient_style = 's',
   save_param = list(
-    save_name = "hex400_total_expr"
+    save_name = "hex400_total_expr",
+    save_format = "svg"
   )
 )
 
+# FIGURE S12 A2 --------------------------------------------------------- ####
 spatInSituPlotPoints(
   g, polygon_feat_type = 'hex100', 
   polygon_fill = 'total_expr',
@@ -193,9 +195,12 @@ spatInSituPlotPoints(
   polygon_line_size = 0, 
   polygon_fill_gradient_style = "s",
   save_param = list(
-    save_name = "hex100_total_expr"
+    save_name = "hex100_total_expr",
+    save_format = "svg"
   )
 )
+
+
 
 
 # filtering ####
@@ -205,7 +210,10 @@ filterCombinations(
   spat_unit = 'hex100',
   expression_thresholds = c(1, 2),
   feat_det_in_min_cells = c(10, 100, 100, 100),
-  min_det_feats_per_cell = c(100, 100, 300, 1000)
+  min_det_feats_per_cell = c(100, 100, 300, 1000),
+  save_param = list(
+    save_name = "filter_combinations"
+  )
 )
 # Based on these results, keep the feat_det_in_min_cells param low so that
 # the removal of features is not too aggressive. min_det_feats_per_cell is
@@ -394,7 +402,8 @@ spatInSituPlotPoints(
   polygon_line_size = 0,
   save_param = list(
     base_width = 10,
-    save_name = 'ss_hex100_leiden_clus'
+    save_name = 'ss_hex100_leiden_clus',
+    save_format = "svg"
   )
 )
 
@@ -407,7 +416,7 @@ spatInSituPlotPoints(
 # Focus in on the brain area for some more focused examples
 
 # create subset extent
-brain_ext <- ext(1000, 3000, 9000, 12000)
+brain_ext <- ext(3826, 5826, 11975, 14975)
 
 # These steps can be done in memory because of the fewer feature detections
 # in play
@@ -432,7 +441,7 @@ instructions(brain, 'return_plot') <- FALSE
 brain <- addSpatialCentroidLocations(brain, poly_info = "hex100")
 brain <- addSpatialCentroidLocations(brain, poly_info = "hex50")
 
-# FIGURE F2 J2 ---------------------------------------------------------- ####
+# FIGURE 2 J2 ---------------------------------------------------------- ####
 # visualize raw transcripts
 spatInSituPlotPoints(
   brain,
@@ -450,7 +459,8 @@ spatInSituPlotPoints(
   use_overlap = FALSE,
   jitter = c(25,25),
   save_param = list(
-    save_name = "brain_pnts"
+    save_name = "brain_pnts",
+    save_format = "svg"
   )
 )
 
@@ -559,7 +569,8 @@ dim_spat_plots <- function(
     point_size = dim_point_size,
     cell_color = color,
     save_param = list(
-      save_name = sprintf("brain_%s_umap", name)
+      save_name = sprintf("brain_%s_umap", name),
+      save_format = "svg"
     )
   )
   
@@ -570,7 +581,8 @@ dim_spat_plots <- function(
     polygon_fill_as_factor = categorical,
     polygon_alpha = 1,
     save_param = list(
-      save_name = sprintf("brain_%s_spat", name)
+      save_name = sprintf("brain_%s_spat", name),
+      save_format = "svg"
     ),
     verbose = FALSE
   )
@@ -686,7 +698,8 @@ heatmSpatialCorFeats(
   use_clus_name = 'spat_netw_clus',
   heatmap_legend_param = list(title = NULL),
   save_param = list(
-    save_name = "brain_spatcor_heatmap"
+    save_name = "brain_spatcor_heatmap",
+    save_format = "svg"
   )
 )
 
@@ -728,7 +741,7 @@ module_plot <- function(modules) {
   }
 }
 
-module_plot(c(1, 8, 14, 11))
+module_plot(c(1, 8, 13, 10))
 
 # pull the top 30 representative genes for each spatial module
 # total of 200 balanced SVGs
@@ -805,7 +818,7 @@ prop_matrix = GiottoUtils::dt_to_matrix(prop_table)
 # 
 # Using kmeans, we can classify each cell by its niche leiden cluster proportions
 set.seed(12345) # set seed for kmeans
-prop_kmeans = kmeans(x = prop_matrix, centers = 16, iter.max = 100, nstart = 3)
+prop_kmeans = kmeans(x = prop_matrix, centers = 15, iter.max = 100, nstart = 3)
 prop_kmeansDT = data.table::data.table(
   cell_ID = names(prop_kmeans$cluster), 
   niche = prop_kmeans$cluster
@@ -829,7 +842,8 @@ spatInSituPlotPoints(
   polygon_fill_as_factor = TRUE,
   polygon_alpha = 1,
   save_param = list(
-    save_name = "brain_hex50_spat_svg_niche"
+    save_name = "brain_hex50_spat_svg_niche",
+    save_format = "svg"
   )
 )
 
@@ -871,7 +885,8 @@ spatInSituPlotPoints(
   polygon_alpha = 0.4,
   jitter = c(25,25),
   save_param = list(
-    save_name = "brain_pts_pvis"
+    save_name = "brain_pts_pvis",
+    save_format = "svg"
   )
 )
 
