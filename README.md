@@ -15,7 +15,7 @@ The [scripts](scripts/) repository contains all the code used to generate the fi
   - [Xenium_coregister](scripts/Xenium_coregister/) - files used with xenium co-registration
  
 
-# Data availability
+# data used
 The following spatial datasets were used in this manuscript:    
 - Spatial Genomics Mouse kidney fresh frozen: https://spatialgenomics.com/data/.    
 - DBiT-seq mouse embryo E10.5: https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE137986.    
