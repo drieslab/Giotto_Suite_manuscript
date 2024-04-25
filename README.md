@@ -3,8 +3,8 @@ Repository containing all files related to the Giotto Suite manuscript.
 The [scripts](scripts/) repository contains all the code used to generate the figures presented.
 
 ## important links
-Giotto Suite [repo](http://giottosuite.com)
-Giotto Suite [preprint](https://www.biorxiv.org/content/10.1101/2023.11.26.568752v1)
+- Giotto Suite [repo](http://giottosuite.com)
+- Giotto Suite [preprint](https://www.biorxiv.org/content/10.1101/2023.11.26.568752v1)
 
 ## folder structure
 - [scripts](scripts/) - main directory containing reproducible scripts and associated subdirectories
