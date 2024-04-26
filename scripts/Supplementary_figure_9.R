@@ -39,36 +39,27 @@ e <- ext(polygons)
 polygons <- flip(polygons)
 ext(polygons) <- e
 
-# image input files
-MX1 = paste0(img_out,'MX1_2375((2706))Yb172.tif')
-Ki67 = paste0(img_out,'Ki-67_142((3020))Pt198.tif')
-CD20 = paste0(img_out,'CD20_36((3317))Nd148.tif')
-CD69 = paste0(img_out,'CD69_2257((2445))Gd156.tif')
 DNA1 = paste0(img_out,'191Ir.tif')
-Actin = paste0(img_out,'Cleaved_93((346))Lu175.tif')
-FoxP3 = paste0(img_out,'FOXP3_115((3001))Dy163.tif')
-MMP9 = paste0(img_out,'MMP9_2241((2912))Gd158.tif')
-CXCL13 = paste0(img_out,'CXCL13 _2316((2458))Dy164.tif')
-CD45 = paste0(img_out,'CD45RO_2014((3019))Dy162.tif')
-vimentin = paste0(img_out,'Vimenti_655((3468))Pt196.tif')
 
+# image input files
+img_list <- list.files(img_out, full.names = TRUE)
+# further panel info here:
+# https://data.mendeley.com/datasets/ncfgz5xxyb/1/files/76410bf6-5b40-4664-9eca-0a8f9c594e81
+names(img_list) <- c(
+  "xenon1",      "xenon2",          "DNA1",       "DNA2",             "AICDA",
+  "Caveolin-1",  "CCL19",           "CCL21",      "CCR7",             "CD163",
+  "CD20",        "CD209",           "CD274",      "CD278",            "CD3",
+  "CD303",       "CD31",            "CD40L",      "CD45RO",           "CD56",
+  "CD69",        "CD8a",            "CD9",        "Cleaved_Caspase3", "CXCL13",
+  "FOXP3",       "TNFRSF18",        "Granzyme B", "HIF-1a",           "H3K9Ac",
+  "HLA-DR",      "IgM",             "Ki67",       "LEF1",             "MMP9",
+  "MX1",         "Myeloperoxidase", "SMA",        "Vimentin",         "XBP1"
+)
 
 
 testg = createGiottoObjectSubcellular(
   gpolygons = list('cell' = polygons),
-  largeImages = list(
-    'MX1' = MX1,
-    'Ki67' = Ki67,
-    'CD20' = CD20,
-    'CD69' = CD69,
-    'DNA1' = DNA1,
-    'Actin' = Actin,
-    'FoxP3' = FoxP3,
-    'MMP9' = MMP9,
-    'CXCL13' = CXCL13,
-    'CD45' = CD45,
-    'vimentin' = vimentin
-  ),
+  largeImages = img_list[4:length(img_list)], # everything but xenon & DNA1 channels
   largeImages_list_params = list(
     negative_y = FALSE,
     extent = NULL,
@@ -120,11 +111,7 @@ testg = calculateOverlap(
   testg,
   spatial_info = 'cell',
   name_overlap = "protein",
-  image_names = c(
-    'MX1', 'Ki67', 'CD20', 'CD69',
-    'DNA1', 'Actin', 'FoxP3', 'MMP9',
-    'CXCL13',  'CD45', 'vimentin'
-  )
+  image_names = names(img_list)[5:length(img_list)] # ignore DNA channel
 )
 
 testg = overlapToMatrix(
@@ -140,11 +127,7 @@ testg = overlapToMatrix(
 testg = calculateOverlap(
   testg,
   spatial_info = 'smallcell',
-  image_names = c(
-    'MX1', 'Ki67', 'CD20', 'CD69',
-    'DNA1', 'Actin', 'FoxP3', 'MMP9',
-    'CXCL13',  'CD45', 'vimentin'
-  )
+  image_names = names(img_list)[5:length(img_list)] # ignore DNA channel
 )
 
 testg = overlapToMatrix(
@@ -159,11 +142,7 @@ testg = overlapToMatrix(
 testg = calculateOverlap(
   testg,
   spatial_info = 'largecell',
-  image_names = c(
-    'MX1', 'Ki67', 'CD20', 'CD69',
-    'DNA1', 'Actin', 'FoxP3', 'MMP9',
-    'CXCL13',  'CD45', 'vimentin'
-  )
+  image_names = names(img_list)[5:length(img_list)] # ignore DNA channel
 )
 
 testg = overlapToMatrix(
@@ -179,16 +158,17 @@ showGiottoExpression(testg)
 
 ## plot raw data images
 
-# for spatial unit = cell
+# for spatial unit = cell, plot DNA2 and the segmentations that were created
+# based on it in QuPath
 svg(file.path(results_folder, "cell_overlap.svg"))
-plot(testg@largeImages$DNA1, max_intensity = 20)
+plot(testg@largeImages$DNA2, max_intensity = 30)
 plot(testg@spatial_info$cell, add = TRUE, border = "red", lwd = 0.7)
 dev.off()
 
 spatInSituPlotPoints(
   testg,
   show_image = T,
-  largeImage_name = 'vimentin',
+  largeImage_name = 'Vimentin',
   spat_unit = 'cell',
   polygon_feat_type = "cell",
   show_polygon = T,
@@ -208,7 +188,7 @@ spatInSituPlotPoints(
 spatInSituPlotPoints(
   testg,
   show_image = T,
-  largeImage_name = 'vimentin',
+  largeImage_name = 'Vimentin',
   spat_unit = 'smallcell',
   polygon_feat_type = "smallcell",
   show_polygon = T,
@@ -226,7 +206,7 @@ spatInSituPlotPoints(
 spatInSituPlotPoints(
   testg,
   show_image = T,
-  largeImage_name = 'vimentin',
+  largeImage_name = 'Vimentin',
   spat_unit = 'largecell',
   polygon_feat_type = "largecell",
   show_polygon = T,
@@ -305,33 +285,35 @@ testg = runPCA(testg, spat_unit = 'largecell', expression_values = 'scaled',
                scale_unit = F, center = F, ncp = 20,
                set_seed = TRUE, seed_number = my_seed_num)
 
-
+screePlot(testg, spat_unit = "cell", save_param = list(save_name = "cell_scree")) # 10PCs
+pcs <- seq(10)
 
 # UMAP
 testg = runUMAP(gobject = testg, spat_unit = 'smallcell',
-                dimensions_to_use = 1:5,
+                dimensions_to_use = pcs,
                 set_seed = TRUE, seed_number = my_seed_num)
 
 testg = runUMAP(gobject = testg, spat_unit = 'cell',
-                dimensions_to_use = 1:5,
+                dimensions_to_use = pcs,
                 set_seed = TRUE, seed_number = my_seed_num)
 
 testg = runUMAP(gobject = testg, spat_unit = 'largecell',
-                dimensions_to_use = 1:5,
+                dimensions_to_use = pcs,
                 set_seed = TRUE, seed_number = my_seed_num)
 
 
 # nearest network & clustering
-testg = createNearestNetwork(testg, spat_unit = 'smallcell', dimensions_to_use = 1:5)
-testg = createNearestNetwork(testg, spat_unit = 'cell', dimensions_to_use = 1:5)
-testg = createNearestNetwork(testg, spat_unit = 'largecell', dimensions_to_use = 1:5)
+testg = createNearestNetwork(testg, spat_unit = 'smallcell', dimensions_to_use = pcs)
+testg = createNearestNetwork(testg, spat_unit = 'cell', dimensions_to_use = pcs)
+testg = createNearestNetwork(testg, spat_unit = 'largecell', dimensions_to_use = pcs)
 
 # K-means
+k <- 9
 testg = doKmeans(testg,
                  spat_unit = "smallcell",
                  feat_type = "protein",
                  expression_values = "scaled",
-                 centers = 5,
+                 centers = k,
                  iter_max = 1000,
                  nstart = 1000,
                  set_seed = TRUE,
@@ -341,7 +323,7 @@ testg = doKmeans(testg,
                  spat_unit = "cell",
                  feat_type = "protein",
                  expression_values = "scaled",
-                 centers = 5,
+                 centers = k,
                  iter_max = 1000,
                  nstart = 1000,
                  set_seed = TRUE,
@@ -351,7 +333,7 @@ testg = doKmeans(testg,
                  spat_unit = "largecell",
                  feat_type = "protein",
                  expression_values = "scaled",
-                 centers = 5,
+                 centers = k,
                  iter_max = 1000,
                  nstart = 1000,
                  set_seed = TRUE,
@@ -363,14 +345,16 @@ testg = doKmeans(testg,
 library(data.table)
 
 # combine metadata from spatial units 'cell' and 'smallcell'
-small_cell_meta = getCellMetadata(testg, spat_unit = 'smallcell', output = 'data.table')
+small_cell_meta = pDataDT(testg, spat_unit = 'smallcell')
 setnames(small_cell_meta, old = 'kmeans', new = 'km_smallcell')
 
-cell_meta = getCellMetadata(testg, spat_unit = 'cell', output = 'data.table')
+cell_meta = pDataDT(testg, spat_unit = 'cell')
 setnames(cell_meta, old = 'kmeans', new = 'km_cell')
 
-comb_meta = data.table::merge.data.table(small_cell_meta[,.(cell_ID, km_smallcell)],
-                                         cell_meta[,.(cell_ID, km_cell)], by = 'cell_ID')
+comb_meta = data.table::merge.data.table(
+  small_cell_meta[,.(cell_ID, km_smallcell)],
+  cell_meta[,.(cell_ID, km_cell)], by = 'cell_ID'
+)
 
 # create quantitative tables for visual inspection
 counttable = table(comb_meta$km_smallcell, comb_meta$km_cell)
@@ -404,8 +388,8 @@ pDataDT(testg)
 
 ## * 7.1. plot original cells ####
 
-# definte cell colors
-my_colors = getDistinctColors(5)
+# define cell colors
+my_colors = getDistinctColors(k)
 order_cell = as.numeric(unlist(lapply(stable_combos, FUN = function(x) {
   strsplit(x, split = '-')[[1]][2]
 })))
@@ -475,7 +459,7 @@ spatInSituPlotPoints(
 ## * 7.2. plot smaller cells ####
 
 # definte smallcell colors
-my_colors_small = getDistinctColors(5)
+my_colors_small = getDistinctColors(k)
 order_small_cell = as.numeric(unlist(lapply(stable_combos, FUN = function(x) {
   strsplit(x, split = '-')[[1]][1]
 })))
@@ -648,20 +632,6 @@ cell_metadata[, (.N/1679)*100, by = .(nb_cells)]
 # neighbors
 library(ggplot2)
 
-pl = ggplot()
-pl = pl + geom_bar(data = cell_metadata, aes(x = '', fill = nb_cells),
-                   position = 'fill')
-pl = pl + ggplot2::scale_fill_manual(values = switch_nb_colors)
-pl = pl + theme_classic()
-pl
-
-ggplot2::ggsave(filename = paste0(results_folder, "/S9E1_barplot_nbs.svg"),
-                plot = pl,
-                device = "svg",
-                width = 3,
-                height = 6)
-
-
 # switches
 cell_metadata[, km_stable := factor(km_stable, levels = c('switch', 'stable'))]
 
@@ -672,25 +642,41 @@ pl = pl + ggplot2::scale_fill_manual(values = c(stable = 'gray', switch = 'red')
 pl = pl + theme_classic()
 pl
 
-ggplot2::ggsave(filename = paste0(results_folder, "/S9E2_barplot_switches.svg"),
+ggplot2::ggsave(filename = paste0(results_folder, "/S9E1_barplot_switches.svg"),
+                plot = pl,
+                device = "svg",
+                width = 3,
+                height = 6)
+
+pl = ggplot()
+pl = pl + geom_bar(data = cell_metadata, aes(x = '', fill = nb_cells),
+                   position = 'fill')
+pl = pl + ggplot2::scale_fill_manual(values = switch_nb_colors)
+pl = pl + theme_classic()
+pl
+
+ggplot2::ggsave(filename = paste0(results_folder, "/S9E2_barplot_nbs.svg"),
                 plot = pl,
                 device = "svg",
                 width = 3,
                 height = 6)
 
 
+
 ## 9. zoomed-in regions ####
 # ------------------------ #
 
 ## for spatial unit = smallcell
-sub_sc_testg = subsetGiottoLocs(testg,
-                                spat_unit = "smallcell",
-                                spat_loc_name = "raw",
-                                x_max = 500,
-                                x_min = 400,
-                                y_max = 100,
-                                y_min = 0,
-                                poly_info = 'smallcell')
+sub_sc_testg = subsetGiottoLocs(
+  testg,
+  spat_unit = "smallcell",
+  spat_loc_name = "raw",
+  x_max = 500,
+  x_min = 400,
+  y_max = 100,
+  y_min = 0,
+  poly_info = 'smallcell'
+)
 
 # kmeans
 spatInSituPlotPoints(
@@ -760,14 +746,16 @@ spatInSituPlotPoints(
 
 
 ## for spatial unit = cell
-sub_c_testg <- subsetGiottoLocs(testg,
-                               spat_unit = "cell",
-                               spat_loc_name = "raw",
-                               x_max = 500,
-                               x_min = 400,
-                               y_max = 100,
-                               y_min = 0,
-                               poly_info = 'cell')
+sub_c_testg <- subsetGiottoLocs(
+  testg,
+  spat_unit = "cell",
+  spat_loc_name = "raw",
+  x_max = 500,
+  x_min = 400,
+  y_max = 100,
+  y_min = 0,
+  poly_info = 'cell'
+)
 
 spatInSituPlotPoints(
   gobject = sub_c_testg,
@@ -883,7 +871,7 @@ prop_table = getSpatialEnrichment(testg, name = 'km_niche', output = 'data.table
 prop_matrix = GiottoUtils::dt_to_matrix(prop_table)
 
 # perform kmeans on spatial enrichment data
-prop_kmeans = kmeans(x = prop_matrix, centers = 5, iter.max = 1000, nstart = 100)
+prop_kmeans = kmeans(x = prop_matrix, centers = k, iter.max = 1000, nstart = 100)
 prop_kmeansDT = data.table(cell_ID = names(prop_kmeans$cluster), niche = prop_kmeans$cluster)
 
 # add results back to giotto object

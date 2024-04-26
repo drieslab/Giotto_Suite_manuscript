@@ -418,6 +418,7 @@ spatInSituPlotPoints(
 # create subset extent
 brain_ext <- ext(3826, 5826, 11975, 14975)
 
+
 # These steps can be done in memory because of the fewer feature detections
 # in play
 
@@ -645,7 +646,9 @@ brain <- createSpatialNetwork(
   gobject = brain,
   spat_unit = 'hex50',
   method = 'kNN',
-  k = 6
+  k = 6,
+  maximum_distance_knn = 60
+  # max distance set so that only direct neighbors will be connected
 )
 
 # will take a little time
@@ -681,7 +684,7 @@ spatcor_obj = detectSpatialCorFeats(
   subset_feats = top_svgs
 )
 
-# cluster spatial genes into 20 modules
+# cluster spatial genes into 15 modules
 spatcor_obj = clusterSpatialCorFeats(
   spatcor_obj, 
   name = 'spat_netw_clus', 
@@ -699,7 +702,7 @@ heatmSpatialCorFeats(
   heatmap_legend_param = list(title = NULL),
   save_param = list(
     save_name = "brain_spatcor_heatmap",
-    save_format = "svg"
+    save_format = "pdf"
   )
 )
 
@@ -743,7 +746,7 @@ module_plot <- function(modules) {
 
 module_plot(c(1, 8, 13, 10))
 
-# pull the top 30 representative genes for each spatial module
+# pull the top 20 representative genes for each spatial module
 # total of 200 balanced SVGs
 balanced_spatmodule_feats <- getBalancedSpatCoexpressionFeats(
   spatCorObject = spatcor_obj,
@@ -818,7 +821,7 @@ prop_matrix = GiottoUtils::dt_to_matrix(prop_table)
 # 
 # Using kmeans, we can classify each cell by its niche leiden cluster proportions
 set.seed(12345) # set seed for kmeans
-prop_kmeans = kmeans(x = prop_matrix, centers = 15, iter.max = 100, nstart = 3)
+prop_kmeans = kmeans(x = prop_matrix, centers = 15, iter.max = 1000, nstart = 3)
 prop_kmeansDT = data.table::data.table(
   cell_ID = names(prop_kmeans$cluster), 
   niche = prop_kmeans$cluster
