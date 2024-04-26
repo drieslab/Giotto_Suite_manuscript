@@ -6,6 +6,12 @@
 ## %######################################################%##
 
 
+############################## Download dataset  ###############################
+
+# Download the CosMx FFPE Non-Small Cell Lung Cancer dataset for lung sample 12
+# from the Nanostring website at
+# https://nanostring.com/products/cosmx-spatial-molecular-imager/ffpe-dataset/nsclc-ffpe-dataset/
+
 ############################## LOAD LIBRARIES ##################################
 
 library(terra)
