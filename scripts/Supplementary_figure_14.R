@@ -1,3 +1,7 @@
+# ----- Dataset -----
+# This scirpt take the Xenium Human Breast Cancer Data as an example.
+# The download link is https://www.10xgenomics.com/products/xenium-in-situ/preview-dataset-human-breast
+
 # ----- Creat Python Environment -----
 # #run in terminal
 # conda create -n giotto python=3.10.2 r=4.2 -y
@@ -7,16 +11,15 @@
 
 
 # ----- Processing 10x Xenium Human Breast Cancer Data -----
-setwd("/sc/arion/projects/YuanLab/gcproj/wen/Giotto_test")
-
 library(Giotto)
 library(reticulate)
 
 results_folder = paste0(getwd(),'/Xenium_results')
+python_path = '.conda/envs/giotto/bin/python'  # change .conda to your conda path, which can be found by running 'conda env list' in terminal
 
 # 3. Create Giotto instructions
 # Directly saving plots to the working directory without rendering them in the editor saves time.
-my_instrs = createGiottoInstructions(python_path = '/sc/arion/work/wangw32/conda-env/envs/giotto/bin/python',
+my_instrs = createGiottoInstructions(python_path = python_path,
                                      save_dir = results_folder,
                                      save_plot = TRUE,
                                      show_plot = TRUE,
