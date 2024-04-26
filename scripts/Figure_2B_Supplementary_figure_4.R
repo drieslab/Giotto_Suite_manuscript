@@ -42,7 +42,11 @@ dapi_img <- getGiottoImage(g, image_type = "largeImage", name = "dapi_z0")
 nrow(tx_points) # number of transcripts within this area
 
 # plot a rasterized representation of the points information
+# without density-based colorization, it displays more clearly where the
+# points spatially cover.
 plot(tx_points) #                                     [S4 A1]
+# With the density, the visualization better shows how the transcripts
+# recapitulate the morphology.
 plot(tx_points, dens = TRUE)
 
 
@@ -163,18 +167,22 @@ nuc_color_codes <- getColors('vivid', n = 7, src = 'rcartocolor')
 plotUMAP(g, spat_unit = 'cell',                       # [S4 C1]
          cell_color = 'leiden_clus',
          show_center_label = FALSE,
-         point_size = 2,
+         point_size = 1,
+         point_shape = "no_border",
          cell_color_code = cell_color_codes,
          save_param = list(
-           save_name = "C1"
+           save_name = "C1",
+           save_format = "svg"
          ))
 plotUMAP(g, spat_unit = 'nucleus',                    # [S4 D1]
          cell_color = 'leiden_clus',
          cell_color_code = nuc_color_codes,
          show_center_label = FALSE,
-         point_size = 2,
+         point_size = 1,
+         point_shape = "no_border",
          save_param = list(
-           save_name = "D1"
+           save_name = "D1",
+           save_format = "svg"
          ))
 
 
@@ -188,7 +196,8 @@ spatInSituPlotPoints(
   polygon_fill_code = cell_color_codes,
   polygon_alpha = 1,
   save_param = list(
-    save_name = "C2"
+    save_name = "C2",
+    save_format = "svg"
   )
 )
 spatInSituPlotPoints(
@@ -200,7 +209,8 @@ spatInSituPlotPoints(
   polygon_fill_code = nuc_color_codes,
   polygon_alpha = 1,
   save_param = list(
-    save_name = "D2"
+    save_name = "D2",
+    save_format = "svg"
   )
 )
 ##### Fig S4 C - D ----------------------------------------------------end ###
@@ -329,10 +339,13 @@ spatPlot(gobject = g,
          background = '#1F0A00')
 
 # Visualize as polygons
-spatInSituPlotPoints(g,
-                     polygon_fill_as_factor = TRUE,
-                     polygon_fill = 'neighborhood',
-                     polygon_alpha = 1)
+spatInSituPlotPoints(
+  g,
+  polygon_fill_as_factor = TRUE,
+  polygon_fill = 'neighborhood',
+  show_legend = FALSE,
+  polygon_alpha = 1
+)
 
 
 
@@ -541,10 +554,14 @@ sankeyPlot(
 
 # (supplemental 4) ####
 
+fig_dir <- "scripts/FIGURE/S4/"
+
 # Fig S4 A1
 # transcript level
 tx = getFeatureInfo(g, return_giottoPoints = TRUE)
+svg(file.path(fig_dir, "A1.svg"))
 plot(tx)
+dev.off()
 
 # Fig S4 A2
 # plot dapi (intensity info)
@@ -554,24 +571,30 @@ plotGiottoImage(g, image_name = 'dapi_z0',
                 largeImage_max_intensity = 15000)
 
 # nucleus level # Fig S4 B1
+svg(file.path(fig_dir, "B1.svg"))
 plot(nuc, col = getDistinctColors(nrow(nuc)), background = 'black', alpha = 0.4)
 nuc_sub = nuc[cell_nuc_sub$b_ID]
-plot(nuc_sub, col = getDistinctColors(nrow(nuc)), background = 'black', alpha = 0.7, border = 'white', add = TRUE)
+plot(nuc_sub, col = getDistinctColors(nrow(nuc)), background = 'black', alpha = 0.7, border = 'white', add = TRUE, lwd = 0.5)
+dev.off()
 
 # cell level # Fig S4 B2
+svg(file.path(fig_dir, "B2.svg"))
 plot(cell, col = getDistinctColors(nrow(cell)), background = 'black', alpha = 0.4)
-plot(cell_sub, col = getDistinctColors(nrow(cell)), background = 'black', alpha = 0.7, border = 'white', add = TRUE)
-
+plot(cell_sub, col = getDistinctColors(nrow(cell)), background = 'black', alpha = 0.7, border = 'white', add = TRUE, lwd = 0.5)
+dev.off()
 
 # neighborhood level # Fig S4 B3
+svg(file.path(fig_dir, "B3.svg"))
 plot(neighborhood, col = getDistinctColors(nrow(neighborhood)), background = 'black', alpha = 0.4)
-plot(neighbor_sub_2, col = getDistinctColors(nrow(neighborhood)), background = 'black', alpha = 0.7, border = 'white', add = TRUE)
+plot(neighbor_sub_2, col = getDistinctColors(nrow(neighborhood)), background = 'black', alpha = 0.7, border = 'white', add = TRUE, lwd = 0.5)
+dev.off()
 
 # domain level # Fig S4 B4
+svg(file.path(fig_dir, "B4.svg"))
 plot(domain, col = getDistinctColors(nrow(domain)), background = 'black', alpha = 0.4)
 domain_sub = domain[paste0('domain_', c(3))]
-plot(domain_sub, col = getDistinctColors(nrow(domain)), background = 'black', alpha = 0.7, border = 'white', add = TRUE)
-
+plot(domain_sub, col = getDistinctColors(nrow(domain)), background = 'black', alpha = 0.7, border = 'white', add = TRUE, lwd = 0.5)
+dev.off()
 
 # compare cross spat_unit UMAP
 
@@ -601,6 +624,7 @@ cell_nuc_leiden = cell_nuc_leiden[, c('leiden_cell', 'leiden_nuc')]
 cell_nuc_leiden[, leiden_cell := paste0('cell_leiden_', leiden_cell)]
 cell_nuc_leiden[, leiden_nuc := paste0('nuc_leiden_', leiden_nuc)]
 
+# Fig S4 E
 sankeyPlot(cell_nuc_leiden,
            nodePadding = 30,
            fontSize = 15,
@@ -611,3 +635,4 @@ sankeyPlot(cell_nuc_leiden,
            nodePadding = 30,
            fontSize = 0,
            nodeWidth = 10)
+
