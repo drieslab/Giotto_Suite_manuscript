@@ -14,6 +14,7 @@ The [scripts](scripts/) repository contains all the code used to generate the fi
   - [SOURCE](scripts/SOURCE/) - scripts to source for additional functionality
   - [Xenium_coregister](scripts/Xenium_coregister/) - files used with xenium co-registration
  
+- [terrabio_startup_scripts](terrabio_startup_scripts/) - directory containing .sh scripts that can be uploaded to [Terra cloud platform](https://app.terra.bio/) for creating a cloud environment with Giotto installed. There is a master.sh file for creating the cloud environment with the previous version of Giotto and suite.sh for creating the cloud environment with the most recent version of Giotto suite.
 
 ## data used
 The following spatial datasets were used in this manuscript:    
