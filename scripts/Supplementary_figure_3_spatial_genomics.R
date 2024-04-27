@@ -21,7 +21,7 @@ mask <- paste0(datadir, "SG_MouseKidneyDataRelease_CellMask_section1.tiff")
 tx <- paste0(datadir, "SG_MouseKidneyDataRelease_TranscriptCoordinates_section1.csv")
 
 
-# Create and plot giotto polygons
+# Create giotto polygons
 gpoly <- createGiottoPolygonsFromMask(maskfile = mask,
   shift_vertical_step = FALSE,
   shift_horizontal_step = FALSE,
@@ -30,23 +30,15 @@ gpoly <- createGiottoPolygonsFromMask(maskfile = mask,
   verbose = TRUE
 )
 
-# Create and plot giotto points
+# Create giotto points
 tx <- data.table::fread(tx)
 gpoints <- createGiottoPoints(tx)
 
-plot(gpoints, raster_size = 1e3)
-
-# Create giottoLargeImage and giottoObject
-gimg <- createGiottoLargeImage(dapi, use_rast_ext = TRUE)
-
+# Create giotto object
 sg <- createGiottoObjectSubcellular(
   gpoints = list("rna" = gpoints),
   gpolygons = list("cell" = gpoly)
 )
-
-sg <- addGiottoLargeImage(sg,
-                          largeImages = list(image = gimg))
-
 
 ## -----------------------------------------------------------------------------
 # Aggregate
