@@ -10,6 +10,7 @@
 ## Registered intermediate files
 ## Registered files can be downloaded from Zenodo in order to reproduce the figure: 10.5281/zenodo.11075079
 ## These files include Xenium_FFPE_Human_Breast_Cancer_Rep1_he_image_compressed.png(target coordinate system), CD20_aligned.csv.gz, DAPI_aligned.csv.gz, HER2_aligned.csv.gz, cell_boundaries_aligned.csv.gz, nucleus_boundaries_aligned.csv.gz, Xenium_Rep1_STalign_to_VisiumHE.csv"
+## As well as aligned polygon coordinate files Baysor_polygons_aligned.csv, aligned_cellpose_v3.csv, aligned_stardist_v3.csv
 ## Place the downloaded aligned files into './Xenium/Aligned_Xe_rep1/' to use the script
 
 ############################# Preprocess and Load ##############################
