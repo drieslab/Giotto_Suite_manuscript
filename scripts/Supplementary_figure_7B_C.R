@@ -323,7 +323,7 @@ if (RELOAD_XENIUM_MULTIOMIC_GOBJECT){
 
   #saveGiotto(gobject = xen, foldername = "gobjects")
 } else{
-  xen = loadGiotto(".xenium/T_vs_IF_results/gobjects")
+  xen = loadGiotto("./xenium/T_vs_IF_results/gobjects")
 }
 
 ####################### Transcript vs IF: ERBB2 and HER2 #######################
