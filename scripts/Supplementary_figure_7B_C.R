@@ -159,9 +159,9 @@ baysor_gpoly = giottoPolygon(spatVector = baysor_poly,
                              unique_ID_cache = names(baysor_poly),
                              name = "Baysor")
 
-################ Aligned polygon loading: StarDist Nuclei ######################
+################ Aligned polygon loading: StarDist  ######################
 
-sd_nuc_dt = data.table::fread("./Xenium/Aligned_Xe_rep1/aligned_stardist_nuclei.csv",
+sd_nuc_dt = data.table::fread("./Xenium/Aligned_Xe_rep1/aligned_stardist_v3.csv",
                               drop = c(1,4,5,9))
 
 data.table::setnames(sd_nuc_dt, old = c("aligned_x", "aligned_y"), new = c("x", "y"))
