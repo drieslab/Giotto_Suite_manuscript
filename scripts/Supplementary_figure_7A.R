@@ -1,14 +1,16 @@
 ## %######################################################%##
 #                                                          #
-####      Supplementary figure 7 Xeinium Co-Register        ####
+####      Supplementary figure 7 Xenium Co-Register        ####
 #                                                          #
 ## %######################################################%##
 
 ## Download data
 ## Original Xenium data can be downloaded from 10X: https://www.10xgenomics.com/products/xenium-in-situ/preview-dataset-human-breast
+## This example script download orginal Xenium and Visium data to './Image_Registration/Xenium_register/outs_rep1/' and "./data/Visium/"
 ## Registered intermediate files
 ## Registered files can be downloaded from Zenodo in order to reproduce the figure: 10.5281/zenodo.11075079
 ## These files include Xenium_FFPE_Human_Breast_Cancer_Rep1_he_image_compressed.png(target coordinate system), CD20_aligned.csv.gz, DAPI_aligned.csv.gz, HER2_aligned.csv.gz, cell_boundaries_aligned.csv.gz, nucleus_boundaries_aligned.csv.gz, Xenium_Rep1_STalign_to_VisiumHE.csv"
+## Place the downloaded aligned files into './Image_Registration/Aligned_Xe_rep1/' to use the script
 
 library(terra)
 
@@ -19,9 +21,8 @@ xenium_folder = './Image_Registration/Xenium_register/outs_rep1/'
 aligned_folder = './Image_Registration/Aligned_Xe_rep1/'
 
 ### Load High Resolution HE image(which is also used as a target coordinate system for image registration)
-images_folder = '/Image_Registration/Xenium_register/Images/'
 ##Note we used a 1:10 compressed image to
-HE_img_path = paste0(images_folder,'Xenium_FFPE_Human_Breast_Cancer_Rep1_he_image_compressed.png')
+HE_img_path = paste0(aligned_folder,'Xenium_FFPE_Human_Breast_Cancer_Rep1_he_image_compressed.png')
 
 #Convert IF images to a point data table, then register that to H&E Image, example can be found in 1st part of fig2B_S7A_Register_Xenium_IF_Visium_to_HE.ipynb
 IF_CD20_path = paste0(aligned_folder, 'CD20_aligned.csv.gz')
@@ -35,7 +36,7 @@ tx_path = paste0(aligned_folder, 'tx_aligned.csv.gz')
 feat_meta_path = paste0(xenium_folder, 'cell_feature_matrix/features.tsv.gz') # This can be found in the Xenium output bundle
 
 ##Get Xenium to Visium Register information, in this figure we just compare which registered cells can be captured by Visium assay. Example script can be found in figS7A_Xenium_to_VisiumHE.ipynb
-xen_df_path = "./Image_Registration/xenium_rep1_to_visium/Xenium_Rep1_STalign_to_VisiumHE.csv"
+xen_df_path = paste0(aligned_folder,"/Xenium_Rep1_STalign_to_VisiumHE.csv")
 #Visium data is raw
 visium_dir = "./data/Visium/"
 
