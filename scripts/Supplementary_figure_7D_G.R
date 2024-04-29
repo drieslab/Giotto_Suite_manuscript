@@ -1,14 +1,16 @@
 ## %######################################################%##
 #                                                          #
-####      Supplementary figure 7 Xeinium Co-Register        ####
+####      Supplementary figure 7 Xenium Co-Register        ####
 #                                                          #
 ## %######################################################%##
 
 ## Download data
 ## Original Xenium data can be downloaded from 10X: https://www.10xgenomics.com/products/xenium-in-situ/preview-dataset-human-breast
+## This example script download orginal Xenium and Visium data to './Image_Registration/Xenium_register/outs_rep1/' and "./data/Visium/"
 ## Registered intermediate files
 ## Registered files can be downloaded from Zenodo in order to reproduce the figure: 10.5281/zenodo.11075079
-## These files include Xenium_FFPE_Human_Breast_Cancer_Rep1_he_image_compressed.png(target coordinate system), CD20_aligned.csv.gz, DAPI_aligned.csv.gz, HER2_aligned.csv.gz, cell_boundaries_aligned.csv.gz, nucleus_boundaries_aligned.csv.gz, Xenium_Rep1_STalign_to_VisiumHE.csv
+## These files include transcripts_Xenium_to_visium_rep1.csv
+## Place the downloaded aligned files into './Image_Registration/xenium_rep1_to_visium/' to use the script
 
 library(Giotto)
 
