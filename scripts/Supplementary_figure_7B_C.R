@@ -1,11 +1,24 @@
+## %######################################################%##
+#                                                          #
+####      Supplementary figure 7 Xenium Co-Register        ####
+#                                                          #
+## %######################################################%##
 
+## Download data
+## Original Xenium data can be downloaded from 10X: https://www.10xgenomics.com/products/xenium-in-situ/preview-dataset-human-breast
+## This example script download orginal Xenium data to './Xenium/'
+## Registered intermediate files
+## Registered files can be downloaded from Zenodo in order to reproduce the figure: 10.5281/zenodo.11075079
+## These files include Xenium_FFPE_Human_Breast_Cancer_Rep1_he_image_compressed.png(target coordinate system), CD20_aligned.csv.gz, DAPI_aligned.csv.gz, HER2_aligned.csv.gz, cell_boundaries_aligned.csv.gz, nucleus_boundaries_aligned.csv.gz, Xenium_Rep1_STalign_to_VisiumHE.csv"
+## As well as aligned polygon coordinate files Baysor_polygons_aligned.csv, aligned_cellpose_v3.csv, aligned_stardist_v3.csv
+## Place the downloaded aligned files into './Xenium/Aligned_Xe_rep1/' to use the script
 
 ############################# Preprocess and Load ##############################
 
 library(terra)
 library(Giotto)
 
-results_folder = '/projectnb/rd-spat/HOME/mobrien2/xenium/T_vs_IF_results'
+results_folder = './xenium/T_vs_IF_results'
 setwd(results_folder)
 
 instrs = createGiottoInstructions(save_dir = results_folder,
@@ -24,7 +37,8 @@ IF_CD20_path = paste0(aligned_folder, 'CD20_aligned.csv.gz')
 IF_DAPI_path = paste0(aligned_folder, 'DAPI_aligned.csv.gz')
 IF_HER2_path = paste0(aligned_folder, 'HER2_aligned.csv.gz')
 feat_meta_path = paste0(xenium_folder, 'cell_feature_matrix/features.tsv.gz') # (also used in aggregate)
-HE_img_path = paste0(images_folder,'Xenium_FFPE_Human_Breast_Cancer_Rep1_he_image_compressed.png')
+HE_img_path = paste0(xenium_folder,'Xenium_FFPE_Human_Breast_Cancer_Rep1_he_image_compressed.png')
+IF_img_path = paste0(xenium_folder,'Xenium_FFPE_Human_Breast_Cancer_Rep1_if_image.tif')
 
 #--- load HE image
 Xenium_HE_img = imager::load.image(HE_img_path)
@@ -131,7 +145,7 @@ replaceRasterNAWithZero <- function(layered_raster = NULL){
 
 ################### Aligned polygon loading: Baysor ############################
 
-baysor_dt = data.table::fread("/projectnb/rd-spat/HOME/mobrien2/xenium/segmentations_aligned/Baysor_polygons_aligned.csv",
+baysor_dt = data.table::fread("./Xenium/Aligned_Xe_rep1/Baysor_polygons_aligned.csv",
                               drop = c(1,2,3,4)) #drop index, old x, and old y columns
 
 data.table::setnames(baysor_dt,
@@ -146,9 +160,9 @@ baysor_gpoly = giottoPolygon(spatVector = baysor_poly,
                              unique_ID_cache = names(baysor_poly),
                              name = "Baysor")
 
-################ Aligned polygon loading: StarDist Nuclei ######################
+################ Aligned polygon loading: StarDist  ######################
 
-sd_nuc_dt = data.table::fread("/projectnb/rd-spat/HOME/mobrien2/xenium/segmentations_aligned/aligned_stardist_nuclei.csv",
+sd_nuc_dt = data.table::fread("./Xenium/Aligned_Xe_rep1/aligned_stardist_v3.csv",
                               drop = c(1,4,5,9))
 
 data.table::setnames(sd_nuc_dt, old = c("aligned_x", "aligned_y"), new = c("x", "y"))
@@ -309,7 +323,7 @@ if (RELOAD_XENIUM_MULTIOMIC_GOBJECT){
 
   #saveGiotto(gobject = xen, foldername = "gobjects")
 } else{
-  xen = loadGiotto("/projectnb/rd-spat/HOME/mobrien2/xenium/T_vs_IF_results/gobjects")
+  xen = loadGiotto("./xenium/T_vs_IF_results/gobjects")
 }
 
 ####################### Transcript vs IF: ERBB2 and HER2 #######################

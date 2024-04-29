@@ -1,3 +1,17 @@
+## %######################################################%##
+#                                                          #
+####      Supplementary figure 7 Xenium Co-Register        ####
+#                                                          #
+## %######################################################%##
+
+## Download data
+## Original Xenium data can be downloaded from 10X: https://www.10xgenomics.com/products/xenium-in-situ/preview-dataset-human-breast
+## This example script download orginal Xenium and Visium data to './Image_Registration/Xenium_register/outs_rep1/' and "./data/Visium/"
+## Registered intermediate files
+## Registered files can be downloaded from Zenodo in order to reproduce the figure: 10.5281/zenodo.11075079
+## These files include transcripts_Xenium_to_visium_rep1.csv
+## Place the downloaded aligned files into './Image_Registration/xenium_rep1_to_visium/' to use the script
+
 library(Giotto)
 
 ## Part 0: Set up Giotto Environment

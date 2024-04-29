@@ -1,4 +1,17 @@
+## %######################################################%##
+#                                                          #
+####      Supplementary figure 8 Multi-Segmentation        ####
+#                                                          #
+## %######################################################%##
 
+## Download data
+## Original Xenium data can be downloaded from 10X: https://www.10xgenomics.com/products/xenium-in-situ/preview-dataset-human-breast
+## This example script download orginal Xenium data to './Xenium/'
+## Registered intermediate files
+## Registered files can be downloaded from Zenodo in order to reproduce the figure: 10.5281/zenodo.11075079
+## These files include Xenium_FFPE_Human_Breast_Cancer_Rep1_he_image_compressed.png(target coordinate system), CD20_aligned.csv.gz, DAPI_aligned.csv.gz, HER2_aligned.csv.gz, cell_boundaries_aligned.csv.gz, nucleus_boundaries_aligned.csv.gz, Xenium_Rep1_STalign_to_VisiumHE.csv"
+## As well as aligned polygon coordinate files Baysor_polygons_aligned.csv, aligned_cellpose_v3.csv, aligned_stardist_v3.csv
+## Place the downloaded aligned files into './Xenium/Aligned_Xe_rep1/' to use the script
 
 ############################# Preprocess and Load ##############################
 
@@ -28,6 +41,7 @@ IF_DAPI_path = paste0(aligned_folder, 'DAPI_aligned.csv.gz')
 IF_HER2_path = paste0(aligned_folder, 'HER2_aligned.csv.gz')
 feat_meta_path = paste0(xenium_folder, 'cell_feature_matrix/features.tsv.gz') # (also used in aggregate)
 HE_img_path = paste0(images_folder,'Xenium_FFPE_Human_Breast_Cancer_Rep1_he_image_compressed.png')
+IF_img_path = paste0(xenium_folder,'Xenium_FFPE_Human_Breast_Cancer_Rep1_if_image.tif')
 
 #--- load HE image
 # Xenium_HE_img = imager::load.image(HE_img_path) # this was never used
@@ -115,7 +129,7 @@ colnames(feat_groups) = c("feature", "cell_type")
 
 ################### Aligned polygon loading: Baysor ############################
 
-baysor_dt = data.table::fread("./Baysor_polygons_aligned.csv",
+baysor_dt = data.table::fread("./Xenium/Aligned_Xe_rep1/Baysor_polygons_aligned.csv",
                               drop = c(1,2,3,4)) #drop index, old x, and old y columns
 
 data.table::setnames(baysor_dt,
@@ -130,7 +144,7 @@ baysor_gpoly = createGiottoPolygonsFromDfr(baysor_dt,
 
 #################### Aligned polygon loading: CellPose #########################
 
-cellpose_dt = data.table::fread("./aligned_cellpose_v3.csv",
+cellpose_dt = data.table::fread("./Xenium/Aligned_Xe_rep1/aligned_cellpose_v3.csv",
                                 drop = c(1,4,5,7))
 
 data.table::setnames(cellpose_dt,
@@ -145,7 +159,7 @@ cellpose_gpoly = createGiottoPolygonsFromDfr(cellpose_dt,
 
 #################### Aligned polygon loading: StarDist #########################
 
-stardist_dt = data.table::fread("./aligned_stardist_v3.csv",
+stardist_dt = data.table::fread("./Xenium/Aligned_Xe_rep1/aligned_stardist_v3.csv",
                                 drop = c(1,4,5,7,8))
 
 data.table::setnames(stardist_dt,
@@ -155,7 +169,7 @@ data.table::setnames(stardist_dt,
 stardist_dt$poly_ID = paste0("polygon_", stardist_dt$geom)
 
 stardist_gpoly = createGiottoPolygonsFromDfr(stardist_dt,
-                                             name = "CellPose",
+                                             name = "StarDist",
                                              calc_centroids = TRUE)
 
 ################### Co-Clustering Analysis: Object Creation ####################
