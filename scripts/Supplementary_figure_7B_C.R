@@ -17,7 +17,7 @@
 library(terra)
 library(Giotto)
 
-results_folder = '.xenium/T_vs_IF_results'
+results_folder = './xenium/T_vs_IF_results'
 setwd(results_folder)
 
 instrs = createGiottoInstructions(save_dir = results_folder,
