@@ -20,10 +20,10 @@ download.file(url = "https://cf.10xgenomics.com/samples/spatial-exp/3.0.0/Visium
 
 ## Untar the file
 untar(tarfile = file.path("data", "Visium_HD_Human_Colon_Cancer_spatial.tar.gz"),
-      exdir = data_path)
+      exdir = "data")
 
 untar(tarfile = file.path("data", "Visium_HD_Human_Colon_Cancer_binned_outputs.tar.gz"),
-      exdir = data_path)
+      exdir = "data")
 
 # Create the object
 library(Giotto)
@@ -33,7 +33,7 @@ results_folder <- "results/"
 
 python_path <- NULL
 
-data_path <- "data/binned_outputs/square_002um/"
+data_path <- "data/binned_outputs/square_016um/"
 
 ## create instructions
 instructions <- createGiottoInstructions(save_dir = results_folder,
@@ -45,12 +45,12 @@ instructions <- createGiottoInstructions(save_dir = results_folder,
 ## Read directly from the visium folder
 readerHD <- importVisiumHD()
 
-readerHD$data_path <- data_path
+readerHD$visiumHD_dir <- data_path
 
 visiumHD <- readerHD$create_gobject(
-  data_path = data_path,
   png_name = "tissue_lowres_image.png",
-  gene_column_index = 2)
+  gene_column_index = 2,
+  instructions = instructions)
 
 # Filtering
 visiumHD <- filterGiotto(gobject = visiumHD,
@@ -63,9 +63,10 @@ visiumHD <- filterGiotto(gobject = visiumHD,
 
 # Normalization
 visiumHD <- normalizeGiotto(gobject = visiumHD,
-                            scalefactor = 6000,
                             feat_type = "rna",
-                            verbose = TRUE)
+                            verbose = TRUE,
+                            scale_feats = FALSE,
+                            scale_cells = FALSE)
 
 # Statistics
 visiumHD <- addStatistics(gobject = visiumHD,
