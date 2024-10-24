@@ -4,7 +4,7 @@
 #                                                           #
 ## %######################################################%##
 
-# Download data
+############################## Download dataset  ###############################
 ## Download the Visium HD Spatial Gene Expression Library,
 ## Human Colorectal Cancer (FFPE) from the 10X genomics website
 ## https://www.10xgenomics.com/datasets/visium-hd-cytassist-gene-expression-libraries-of-human-crc
@@ -25,7 +25,8 @@ untar(tarfile = file.path("data", "Visium_HD_Human_Colon_Cancer_spatial.tar.gz")
 untar(tarfile = file.path("data", "Visium_HD_Human_Colon_Cancer_binned_outputs.tar.gz"),
       exdir = "data")
 
-# Create the object
+############################## Create the object  ##############################
+
 library(Giotto)
 
 # Set instructions
@@ -52,7 +53,8 @@ visiumHD <- readerHD$create_gobject(
   gene_column_index = 2,
   instructions = instructions)
 
-# Filtering
+#################################### Filtering  ################################
+
 visiumHD <- filterGiotto(gobject = visiumHD,
                          expression_threshold = 1,
                          feat_det_in_min_cells = 40,
@@ -61,18 +63,21 @@ visiumHD <- filterGiotto(gobject = visiumHD,
                          feat_type = "rna",
                          verbose = TRUE)
 
-# Normalization
+################################ Normalization  ################################
+
 visiumHD <- normalizeGiotto(gobject = visiumHD,
                             feat_type = "rna",
                             verbose = TRUE,
                             scale_feats = FALSE,
                             scale_cells = FALSE)
 
-# Statistics
+################################# Statistics  ##################################
+
 visiumHD <- addStatistics(gobject = visiumHD,
                           feat_type = "rna")
 
-# Dimension reduction
+############################## Dimension reduction  ############################
+
 visiumHD <- calculateHVF(gobject = visiumHD,
                          spat_unit = "hexagon400",
                          feat_type = "rna",
@@ -81,7 +86,8 @@ visiumHD <- calculateHVF(gobject = visiumHD,
 visiumHD <- runPCA(gobject = visiumHD,
                    feat_type = "rna")
 
-# Clustering
+################################### Clustering  ################################
+
 visiumHD <- runUMAP(visiumHD,
                     dimensions_to_use = 1:10,
                     feat_type = "rna")
@@ -96,7 +102,7 @@ visiumHD <- doLeidenCluster(gobject = visiumHD,
                             resolution = 1,
                             n_iterations = 10)
 
-# Identify Spatial Genes
+################################# Spatial Genes  ###############################
 
 featData <- fDataDT(visiumHD)
 hvf_genes <- featData[hvf == "yes"]$feat_ID
@@ -140,7 +146,8 @@ spatInSituPlotPoints(visiumHD,
                      polygon_line_size = 0.01,
                      jitter = c(25,25))
 
-# Session info
+################################# Session info  ################################
+
 sessionInfo()
 
 R version 4.4.1 (2024-06-14)

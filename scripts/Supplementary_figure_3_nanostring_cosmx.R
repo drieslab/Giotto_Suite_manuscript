@@ -18,15 +18,13 @@ library(terra)
 library(patchwork)
 library(ggplot2)
 library(Giotto)
-# Custom color palettes from rcartocolor
 
-# pal10 = rcartocolor::carto_pal(n = 10, name = 'Pastel')
+# Custom color palettes from rcartocolor
 pal10 <- c(
   "#66C5CC", "#F6CF71", "#F89C74", "#DCB0F2", "#87C55F",
   "#9EB9F3", "#FE88B1", "#C9DB74", "#8BE0A4", "#B3B3B3"
 )
 
-# viv10 = rcartocolor::carto_pal(n = 10, name = 'Vivid')
 viv10 <- c(
   "#E58606", "#5D69B1", "#52BCA3", "#99C945", "#CC61B0",
   "#24796C", "#DAA51B", "#2F8AC4", "#764E9F", "#A5AA99"
@@ -34,19 +32,18 @@ viv10 <- c(
 
 ############################ Set seed, Initialize ###############################
 
-
-# set working directory to results folder for plot saving
-results_folder <- "results_nanostring/"
+# set results folder for plot saving
+results_folder <- "results/"
 my_seed_num <- 315
 set.seed(my_seed_num)
-my_python_path <- NULL # alternatively, "/local/python/path/python" if desired.
+python_path <- NULL # alternatively, "/local/python/path/python" if desired.
 
-instrs <- createGiottoInstructions(
+instructions <- createGiottoInstructions(
   save_dir = results_folder,
   save_plot = FALSE,
   show_plot = TRUE,
   return_plot = TRUE,
-  python_path = my_python_path
+  python_path = python_path
 )
 
 ## provide path to nanostring folder
@@ -63,7 +60,7 @@ fov_join <- createGiottoCosMxObject(
     11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
     21, 22, 23, 24, 25, 26, 27, 28
   ),
-  instructions = instrs
+  instructions = instructions
 )
 
 showGiottoFeatInfo(fov_join)
@@ -103,12 +100,12 @@ morphometa <- combineCellData(fov_join,
 
 # combine feature data
 featmeta <- combineFeatureData(fov_join,
-                               feat_type = c("rna")
+                               feat_type = "rna"
 )
 
 # combine overlapping feature data
 featoverlapmeta <- combineFeatureOverlapData(fov_join,
-                                             feat_type = c("rna")
+                                             feat_type = "rna"
 )
 
 ################### Filtering, Normalization, and Stats ########################
@@ -138,10 +135,6 @@ fov_join <- normalizeGiotto(
   verbose = TRUE
 )
 
-
-
-showGiottoExpression(fov_join)
-
 # add statistics based on log normalized values for features rna and negative probes
 fov_join <- addStatistics(
   gobject = fov_join,
@@ -154,13 +147,7 @@ fov_join <- addStatistics(
   feat_type = "neg_probe"
 )
 
-# View cellular data (default is feat = 'rna')
-showGiottoCellMetadata(fov_join)
-# View feature data
-showGiottoFeatMetadata(fov_join)
-
-
-############### Dimension Reductions, NN Networks, Clustering ##################
+############### Dimension Reduction, NN Network, Clustering ####################
 
 # PCA
 fov_join <- runPCA(fov_join,
@@ -182,6 +169,7 @@ fov_join <- createNearestNetwork(
   dimensions_to_use = 1:10,
   k = 10
 )
+
 # Leiden Clustering
 fov_join <- doLeidenCluster(
   gobject = fov_join,
@@ -191,7 +179,6 @@ fov_join <- doLeidenCluster(
   set_seed = TRUE
 )
 
-
 ################## Spatially Variable Gene Identification ######################
 
 # create spatial network based on physical distance of cell centroids
@@ -200,7 +187,6 @@ fov_join <- createSpatialNetwork(
   minimum_k = 2,
   maximum_distance_delaunay = 50
 )
-
 
 # Perform Binary Spatial Extraction of genes
 # NOTE: Depending on your system this could take time
@@ -238,7 +224,6 @@ fov_join <- createMetafeats(fov_join,
 )
 
 svg_names <- names(cluster_genes)
-
 
 ####################### Spatially Informed Clustering ##########################
 
@@ -283,7 +268,6 @@ fov_join <- doLeidenClusterIgraph(
 
 ################## Visualize Spatially Informed Clustering #####################
 
-pdf("spatPlot_custom_clustering.pdf", width = 20, height = 10)
 sp_pl <- spatPlot2D(fov_join,
                     cell_color = "custom_leiden",
                     point_size = 4,
@@ -291,7 +275,6 @@ sp_pl <- spatPlot2D(fov_join,
                     save_plot = FALSE,
                     return_plot = TRUE
 )
-dev.off()
 
 leiden_colors <- getDistinctColors(length(unique(getCellMetadata(fov_join)[]$custom_leiden)))
 names(leiden_colors) <- sort(unique(getCellMetadata(fov_join)[]$custom_leiden))
@@ -303,9 +286,7 @@ sisp_pl <- spatInSituPlotPoints(fov_join,
                                 polygon_fill = "custom_leiden",
                                 polygon_fill_code = leiden_colors,
                                 polygon_fill_as_factor = TRUE,
-                                show_plot = TRUE,
-                                return_plot = TRUE,
-                                save_plot = FALSE
+                                return_plot = TRUE
 )
 
 ggplot2::ggsave(
@@ -343,8 +324,7 @@ roi_sisp_pl <- spatInSituPlotPoints(ROI,
                                       "MALAT1",
                                       "KRT19",
                                       "COL1A1",
-                                      "CD74"
-                                    ),
+                                      "CD74"),
                                     point_size = 0.25,
                                     show_polygon = TRUE,
                                     use_overlap = FALSE,
@@ -355,9 +335,7 @@ roi_sisp_pl <- spatInSituPlotPoints(ROI,
                                     polygon_fill_code = leiden_colors,
                                     polygon_fill_as_factor = TRUE,
                                     show_legend = FALSE,
-                                    show_plot = TRUE,
-                                    return_plot = TRUE,
-                                    save_plot = FALSE
+                                    return_plot = TRUE
 )
 
 

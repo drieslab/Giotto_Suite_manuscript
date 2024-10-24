@@ -4,8 +4,7 @@
 #                                                          #
 ## %######################################################%##
 
-## Download data
-
+############################## Download dataset  ###############################
 ## Download
 ## - 1st-Seq coordinate information for liver dataset (MiSeq-DraI-100pM-mbcore-RD2-revHDMIs-pos-uniq.txt)
 ## - 1st-Seq raw MiSeq FASTQ output file for liver dataset (DraI-100pM-mbcore-RD2.fastq.gz)
@@ -27,13 +26,12 @@ library(terra)
 library(Matrix)
 library(scattermore)
 
-
-# Set instructions
+############################## Set instructions  ###############################
 python_path <- NULL
 
 results_folder <- "results"
 
-instrs <- createGiottoInstructions(
+instructions <- createGiottoInstructions(
     save_dir = results_folder,
     save_plot = TRUE,
     show_plot = TRUE,
@@ -41,6 +39,8 @@ instrs <- createGiottoInstructions(
 )
 
 dataDir <- "data/raw/"
+
+############################## Create the object  ##############################
 
 # read raw data
 
@@ -125,7 +125,7 @@ gpoints_aggr <- gpoints_aggr[total_counts > 8 & total_counts < 1000]
 seqscope <- createGiottoObjectSubcellular(
     gpoints = list(rna = gpoints_extra[, .(x, y, gene, hdmi)]),
     gpolygons = list(cell = final_polygons),
-    instructions = instrs
+    instructions = instructions
 )
 
 # Overlap to Polygon information
@@ -134,7 +134,7 @@ seqscope <- overlapToMatrix(seqscope)
 seqscope <- addSpatialCentroidLocations(seqscope,
                                         poly_info = "cell")
 
-# filter
+#################################### Filtering  ################################
 seqscope <- filterGiotto(
     gobject = seqscope,
     expression_threshold = 1,
@@ -143,15 +143,15 @@ seqscope <- filterGiotto(
 )
 
 
-# normalize
+################################ Normalization  ################################
 seqscope <- normalizeGiotto(gobject = seqscope,
                             scalefactor = 100,
                             verbose = TRUE)
 
-# add statistics
+################################# Statistics  ##################################
 seqscope <- addStatistics(gobject = seqscope)
 
-# cluster cells
+############################## Dimension reduction  ############################
 seqscope <- calculateHVF(gobject = seqscope,
                          HVFname = "hvg_orig")
 
@@ -162,6 +162,8 @@ seqscope <- runPCA(
     scale_unit = TRUE,
     center = TRUE
 )
+
+################################### Clustering  ################################
 
 seqscope <- runUMAP(seqscope,
                     dimensions_to_use = 1:100)
@@ -192,14 +194,14 @@ spatInSituPlotPoints(seqscope,
     save_param = list(base_width = 10)
 )
 
-# Subset
+################################### Subset  ####################################
+
 seqscope_sub <- subsetGiottoLocs(seqscope,
                                  x_max = 15000,
                                  x_min = 10000,
                                  y_max = 15000,
                                  y_min = 10000
 )
-
 
 pdt <- pDataDT(seqscope_sub)
 

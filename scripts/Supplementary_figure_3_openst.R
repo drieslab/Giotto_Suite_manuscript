@@ -4,7 +4,7 @@
 #                                                           #
 ## %######################################################%##
 
-# Download data
+############################## Download dataset  ###############################
 ## Download the adult mouse hippocampus dataset from the paper
 ## [Open-ST: High-resolution spatial transcriptomics in 3D](https://www.sciencedirect.com/science/article/pii/S0092867424006366)
 ## available in this link https://rajewsky-lab.github.io/openst/latest/examples/datasets/
@@ -22,7 +22,8 @@ download.file(url = "http://bimsbstatic.mdc-berlin.de/rajewsky/openst-public-dat
 untar(tarfile = file.path(data_path, "adult_mouse_by_cell.h5ad.tar.gz"),
       exdir = data_path)
 
-# Create the object
+############################## Create the object  ##############################
+
 library(Giotto)
 
 ## create the object directly from the h5ad file
@@ -42,26 +43,31 @@ cell_metadata <- cell_metadata[cell_metadata$cell_ID != "0",]
 giotto_object <- subsetGiotto(giotto_object,
                               cell_ids = cell_metadata$cell_ID)
 
-# Filtering
+#################################### Filtering  ################################
+
 giotto_object <- filterGiotto(gobject = giotto_object,
                               expression_threshold = 1,
                               feat_det_in_min_cells = 25,
                               min_det_feats_per_cell = 100,
                               verbose = TRUE)
 
-# Normalization
+################################ Normalization  ################################
+
 giotto_object <- normalizeGiotto(giotto_object,
                                  scale_feats = FALSE,
                                  scale_cells = FALSE)
 
-# Statistics
+################################# Statistics  ##################################
+
 giotto_object <- addStatistics(giotto_object)
 
-# Dimension reduction
+############################## Dimension reduction  ############################
+
 giotto_object <- runPCA(giotto_object,
                         ncp = 50)
 
-# Clustering
+################################### Clustering  ################################
+
 giotto_object <- runUMAP(giotto_object,
                          dimensions_to_use = 1:10)
 
@@ -75,7 +81,8 @@ spatPlot2D(giotto_object,
            point_size = 0.7,
            background_color = "black")
 
-# Session info
+################################# Session info  ################################
+
 sessionInfo()
 
 R version 4.4.1 (2024-06-14)

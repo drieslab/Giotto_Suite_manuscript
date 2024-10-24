@@ -4,7 +4,7 @@
 #                                                           #
 ## %######################################################%##
 
-# Download data
+############################## Download dataset  ###############################
 ## Download the mouse brain dataset deposited in the NeMO database
 ## by the Macosko lab under the grant rf1_macosko
 
@@ -22,14 +22,14 @@ download.file(url = "https://data.nemoarchive.org/biccn/grant/rf1_macosko/macosk
 untar(tarfile = file.path(data_path, "2020-12-19_Puck_201112_26.matched.digital_expression.mex.tar.gz"),
       exdir = data_path)
 
-# Create the object
+############################## Create the object  ##############################
 library(Giotto)
 
-instrs <- createGiottoInstructions(save_plot = TRUE,
-                                   save_dir = "results",
-                                   show_plot = FALSE,
-                                   return_plot = FALSE,
-                                   python_path = NULL)
+instructions <- createGiottoInstructions(save_plot = TRUE,
+                                         save_dir = "results",
+                                         show_plot = FALSE,
+                                         return_plot = FALSE,
+                                         python_path = NULL)
 
 expression_matrix <- get10Xmatrix(file.path(data_path, "2020-12-19_Puck_201112_26.matched.digital_expression"))
 
@@ -38,27 +38,32 @@ spatial_locs <- data.table::fread(file.path(data_path, "2020-12-19_Puck_201112_2
 spatial_locs <- spatial_locs[spatial_locs$barcodes %in% colnames(expression_matrix),]
 
 giotto_object <- createGiottoObject(
-    expression = expression_matrix,
-    spatial_locs = spatial_locs,
-    instructions = instrs
+  expression = expression_matrix,
+  spatial_locs = spatial_locs,
+  instructions = instructions
 )
 
-# Filtering
+#################################### Filtering  ################################
+
 giotto_object <- filterGiotto(giotto_object,
                               min_det_feats_per_cell = 10,
                               feat_det_in_min_cells = 10)
 
-# Normalization
+################################ Normalization  ################################
+
 giotto_object <- normalizeGiotto(giotto_object)
 
-# Statistics
+################################# Statistics  ##################################
+
 giotto_object <- addStatistics(giotto_object)
 
-# Dimension reduction
+############################## Dimension reduction  ############################
+
 giotto_object <- runPCA(giotto_object,
                         ncp = 50)
 
-# Clustering
+################################### Clustering  ################################
+
 giotto_object <- runUMAP(giotto_object,
                          dimensions_to_use = 1:10)
 
@@ -72,7 +77,8 @@ spatPlot2D(giotto_object,
            point_size = 1,
            background_color = "black")
 
-# Session info
+################################# Session info  ################################
+
 sessionInfo()
 
 R version 4.4.1 (2024-06-14)
@@ -84,19 +90,19 @@ BLAS:   /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/ve
 LAPACK: /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.0
 
 locale:
-    [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+  [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
 
 time zone: America/New_York
 tzcode source: internal
 
 attached base packages:
-    [1] stats     graphics  grDevices utils     datasets  methods   base
+  [1] stats     graphics  grDevices utils     datasets  methods   base
 
 other attached packages:
-    [1] Giotto_4.1.0      GiottoClass_0.3.5
+  [1] Giotto_4.1.0      GiottoClass_0.3.5
 
 loaded via a namespace (and not attached):
-    [1] colorRamp2_0.1.0            deldir_2.0-4
+  [1] colorRamp2_0.1.0            deldir_2.0-4
 [3] rlang_1.1.4                 magrittr_2.0.3
 [5] RcppAnnoy_0.0.22            GiottoUtils_0.1.12
 [7] matrixStats_1.4.1           compiler_4.4.1

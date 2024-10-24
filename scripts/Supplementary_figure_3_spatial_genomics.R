@@ -4,21 +4,20 @@
 #                                                          #
 ## %######################################################%##
 
-## -------------------------------------------------------------------------- ##
-# Download dataset
+############################## Download dataset  ###############################
 # The mouse kidney fresh frozen dataset was downloaded from the Spatial Genomics
 # website at https://db.cngb.org/stomics/mosta/download/.
 
-## -------------------------------------------------------------------------- ##
-# Load data
+############################## Create the object  ##############################
+
 library(Giotto)
 
 # Set path to folder containing spatial genomics data
-datadir <- "data/"
+data_path <- "data/"
 
-dapi <- paste0(datadir, "SG_MouseKidneyDataRelease_DAPI_section1.ome.tiff")
-mask <- paste0(datadir, "SG_MouseKidneyDataRelease_CellMask_section1.tiff")
-tx <- paste0(datadir, "SG_MouseKidneyDataRelease_TranscriptCoordinates_section1.csv")
+dapi <- paste0(data_path, "SG_MouseKidneyDataRelease_DAPI_section1.ome.tiff")
+mask <- paste0(data_path, "SG_MouseKidneyDataRelease_CellMask_section1.tiff")
+tx <- paste0(data_path, "SG_MouseKidneyDataRelease_TranscriptCoordinates_section1.csv")
 
 
 # Create giotto polygons
@@ -40,8 +39,8 @@ sg <- createGiottoObjectSubcellular(
   gpolygons = list("cell" = gpoly)
 )
 
-## -----------------------------------------------------------------------------
-# Aggregate
+#################################### Aggregate  ################################
+
 sg <- calculateOverlapRaster(sg,
   spatial_info = "cell",
   feat_info = "rna"
@@ -51,7 +50,7 @@ sg <- overlapToMatrix(sg)
 
 sg <- addSpatialCentroidLocations(sg)
 
-# Filter and Normalize
+#################################### Filtering  ################################
 
 filterDistributions(sg, detection = "feats")
 
@@ -62,13 +61,17 @@ sg <- filterGiotto(sg,
                    min_det_feats_per_cell = 20,
                    expression_threshold = 1)
 
+################################ Normalization  ################################
+
 sg <- normalizeGiotto(sg)
 
-# Statistics
+################################# Statistics  ##################################
+
 sg <- addStatistics(sg)
 
 
-## -----------------------------------------------------------------------------
+############################## Dimension reduction  ############################
+
 # Calculate highly variable features
 
 sg <- calculateHVF(gobject = sg)
@@ -82,13 +85,10 @@ sg <- runPCA(gobject = sg,
              center = FALSE
 )
 
-
-## -----------------------------------------------------------------------------
 # Visualize Screeplot and PCA
 
 screePlot(sg,
-          ncp = 20,
-          save_param = list(save_name = "sg_screePlot")
+          ncp = 20
 )
 
 plotPCA(sg,
@@ -99,7 +99,7 @@ plotPCA(sg,
 )
 
 
-## -----------------------------------------------------------------------------
+################################### Clustering  ################################
 # Run and Plot tSNE and UMAP
 
 sg <- runtSNE(sg,
@@ -114,13 +114,11 @@ sg <- runUMAP(sg,
 )
 
 plotTSNE(sg,
-         point_size = 0.01,
-         save_param = list(save_name = "sg_tSNE")
+         point_size = 0.01
 )
 
 plotUMAP(sg,
-         point_size = 0.01,
-         save_param = list(save_name = "sg_UMAP")
+         point_size = 0.01
 )
 
 
@@ -140,20 +138,16 @@ sg <- doLeidenCluster(sg,
 )
 
 # Plot Leiden clusters onto UMAP
-
 plotUMAP(gobject = sg,
          spat_unit = "cell",
          cell_color = "leiden_clus",
          show_legend = FALSE,
          point_size = 0.01,
-         point_shape = "no_border",
-         save_param = list(save_name = "sg_umap_leiden")
+         point_shape = "no_border"
 )
 
 
-## -----------------------------------------------------------------------------
 # Plot Leiden clusters onto spatial image plot
-
 my_spatPlot <- spatPlot2D(gobject = sg,
                           spat_unit = "cell",
                           cell_color = "leiden_clus",
@@ -166,9 +160,7 @@ my_spatPlot <- spatPlot2D(gobject = sg,
                                             base_height = 15)
 )
 
-
-## -----------------------------------------------------------------------------
-# Identify gene markers per cluster
+###################### Identify gene markers per cluster  ######################
 
 markers <- findMarkers_one_vs_all(gobject = sg,
                                   method = "gini",
@@ -178,7 +170,6 @@ markers <- findMarkers_one_vs_all(gobject = sg,
                                   rank_score = 2
 )
 
-# Display details about the marker genes
 markers[, head(.SD, 2), by = "cluster"]
 
 # Violinplots to show marker expression
@@ -213,7 +204,8 @@ plotMetaDataHeatmap(sg,
 )
 
 
-## -----------------------------------------------------------------------------
+############################### Spatial genes  #################################
+
 plotStatDelaunayNetwork(gobject = sg,
                         maximum_distance = 250)
 
@@ -228,8 +220,6 @@ sg <- createSpatialNetwork(gobject = sg,
                            k = 10
 )
 
-
-## -----------------------------------------------------------------------------
 km_spatialgenes <- binSpect(sg)
 
 spatFeatPlot2D(sg,
@@ -242,8 +232,6 @@ spatFeatPlot2D(sg,
                cow_n_col = 2
 )
 
-
-## -----------------------------------------------------------------------------
 rank_spatialgenes <- binSpect(sg,
                               bin_method = "rank")
 
@@ -257,20 +245,18 @@ spatFeatPlot2D(sg,
                cow_n_col = 2
 )
 
-
-## -----------------------------------------------------------------------------
-# Spatial Co-Expression
+############################ Spatial Co-Expression  ############################
 
 spatial_genes <- km_spatialgenes[1:500]$feats
 
-# 1. create spatial correlation object
+# create spatial correlation object
 spat_cor_obj <- detectSpatialCorFeats(sg,
                                       method = "network",
                                       spatial_network_name = "Delaunay_network",
                                       subset_feats = spatial_genes
 )
 
-# 2. identify most similar spatially correlated genes for one gene
+# identify most similar spatially correlated genes for one gene
 Acsm2_top10_genes <- showSpatialCorFeats(spat_cor_obj,
                                          feats = "Acsm2",
                                          show_top_feats = 10)
@@ -282,9 +268,7 @@ spatFeatPlot2D(sg,
                point_shape = "no_border"
 )
 
-
-## -----------------------------------------------------------------------------
-# 3. cluster correlated genes & visualize
+# cluster correlated genes & visualize
 
 spat_cor_obj <- clusterSpatialCorFeats(spat_cor_obj,
                                        name = "spat_netw_clus",
@@ -296,9 +280,7 @@ heatmSpatialCorFeats(sg,
                      heatmap_legend_param = list(title = "Spatial Correlation")
 )
 
-
-## -----------------------------------------------------------------------------
-# 4. rank spatial correlated clusters and show genes for selected clusters
+# rank spatial correlated clusters and show genes for selected clusters
 
 netw_ranks <- rankSpatialCorGroups(sg,
                                    spatCorObject = spat_cor_obj,
@@ -310,9 +292,7 @@ top_netw_spat_cluster <- showSpatialCorFeats(spat_cor_obj,
                                              show_top_feats = 1
 )
 
-
-## -----------------------------------------------------------------------------
-# 5. create metagene enrichment score for clusters
+# create metagene enrichment score for clusters
 
 cluster_genes <- top_netw_spat_cluster$clus
 names(cluster_genes) <- top_netw_spat_cluster$feat_ID
@@ -342,5 +322,6 @@ spatCellPlot(sg,
              point_shape = "no_border"
 )
 
+################################# Session info  ################################
 
 sessionInfo()
