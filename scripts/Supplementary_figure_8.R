@@ -360,6 +360,7 @@ spatPlot2D(xen_cell,
 
 baysor_cell_meta = map_cell_meta[map_cell_meta$list_ID == 'Baysor']
 baysor_cell_meta$cell_ID = sub(".*-", "", baysor_cell_meta$cell_ID)
+xen_baysor <- subsetGiotto(xen_baysor,cell_ids = baysor_cell_meta$cell_ID)
 xen_baysor <- addCellMetadata(xen_baysor,
                             spat_unit = 'cell',feat_type = 'rna',
                             baysor_cell_meta,
