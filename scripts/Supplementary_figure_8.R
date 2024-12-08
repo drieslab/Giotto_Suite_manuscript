@@ -353,8 +353,9 @@ xen_cell <- addCellMetadata(xen_cell,
                             column_cell_ID = "cell_ID")
 spatPlot2D(xen_cell,
            cell_color = "mapped_type",
-           cell_color_code = my_colors,point_border_stroke = 0,
-           point_size = 1e-5,
+           cell_color_code = my_colors,
+           point_border_stroke = 0,
+           point_size = 1e-6,
            background_color = 'black',
            title = 'cell')
 
@@ -368,8 +369,9 @@ xen_baysor <- addCellMetadata(xen_baysor,
                             column_cell_ID = "cell_ID")
 spatPlot2D(xen_baysor,
            cell_color = "mapped_type",
-           cell_color_code = my_colors,point_border_stroke = 0,
-           point_size = 1e-5,
+           cell_color_code = my_colors,
+           point_border_stroke = 0,
+           point_size = 1e-6,
            background_color = 'black',
            title = 'cell')
 
