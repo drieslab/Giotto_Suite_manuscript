@@ -303,54 +303,6 @@ dimPlot2D(join_xen,
           cell_color = "leiden_clus")
 
 
-#################################################################################################################################################################DEL
-
-sub_join_xen = subsetGiotto(join_xen, 
-                            cell_ids = subset_IDs)
-
-sub_join_xen = createNearestNetwork(sub_join_xen,
-                                    dim_reduction_name = 'pca.projection',
-                                    dimensions_to_use = 1:25,
-                                    k = 30)
-sub_join_xen = doLeidenClusterIgraph(gobject = sub_join_xen,
-                                     spat_unit = "cell",
-                                     feat_type = "rna",
-                                     resolution = 0.55, 
-                                     n_iterations = 100,
-                                     name = "sub_leiden_clus",
-                                     set_seed = TRUE,
-                                     seed_number = my_seed_number) 
-
-join_xen = doClusterProjection(target_gobject = join_xen,
-                               source_gobject = sub_join_xen,
-                               spat_unit = "cell",
-                               reduction_name = 'pca.projection',
-                               feat_type = "rna",
-                               source_cluster_labels = "sub_leiden_clus",
-                               prob = FALSE,
-                               knn_k = 30,
-                               dimensions_to_use = 1:25)
-dimPlot2D(join_xen,
-          dim_reduction_name = "umap.projection",
-          cell_color = "knn_labels")
-
-
-map_cell_meta = getCellMetadata(join_xen, output = "data.table")
-origin_label <- read.csv('/projectnb/rd-spat/HOME/junxiang/Manuscript/Giotto_suite_revision/segmentation/celltypes_Xenium10XLabel.csv')
-origin_label$cell_ID = paste0('cell-',origin_label$Barcode)
-original_cell_meta = map_cell_meta[map_cell_meta$list_ID == 'cell']
-
-cell_sub <- subsetGiotto(join_xen,cell_ids = original_cell_meta$cell_ID)
-cell_sub <- addCellMetadata(cell_sub,
-                            spat_unit = 'cell',
-                            feat_type = 'rna',
-                            origin_label,
-                            by_column = TRUE,
-                            column_cell_ID = "cell_ID")
-dimPlot2D(cell_sub,
-          dim_reduction_name = "umap.projection",
-          cell_color = "Celltype")
-#################################################################################################################################################################DEL
 
 
 fin_clusters = sort(as.integer(unique(join_xen@cell_metadata$cell$rna[]$leiden_clus)))
