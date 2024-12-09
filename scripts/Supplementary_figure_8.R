@@ -12,6 +12,8 @@
 ############################# Preprocess and Load #############################
 library(Giotto)
 
+data_dir <- "path/to/data" # set this
+
 ## Assign the data directory
 Xenium_dir <- paste0(data_dir, "/Xenium/")
 Segmentation_dir <- paste0(data_dir, "/Segmentation_dir/")
