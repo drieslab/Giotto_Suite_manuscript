@@ -9,11 +9,12 @@
 ## This example script download orginal Xenium data to './Xenium/'
 ## Use the Baysor_run.sh to run Baysor and Place the Baysor output "segmentation_polygons.json" as "baysor.json" in './Segmentation_dir/'
 
-############################# Preprocess and Load ##############################
+############################# Preprocess and Load #############################
+library(Giotto)
+
 ## Assign the data directory
 Xenium_dir <- paste0(data_dir,'/Xenium/')
 Segmentation_dir <- paste0(data_dir,'/Segmentation_dir/')
-library(Giotto)
 
 
 # Load transcripts and default segmentations
@@ -31,7 +32,7 @@ aff <- affine() |> flip(direction = 'vertical')
 cell <- affine(cell,aff)
 tx_pts <- affine(tx[[1]]$rna,aff)
 tx_pts
-######################################################################## Multi_segmentation #########################################################################
+############## Multi_segmentation##############################################
 # Segmentations Wrappers
 IF_xen <- read10xAffineImage(file = paste0(Xenium_dir, "/Xenium_FFPE_Human_Breast_Cancer_Rep1_if_image.ome.tif"),
                              imagealignment_path = paste0(Xenium_dir,"/Xenium_FFPE_Human_Breast_Cancer_Rep1_if_imagealignment.csv"),
@@ -116,7 +117,7 @@ data.table::setnames(baysor_poly_dt,
                      new = 'poly_ID')
 Baysor_gpoly = createGiottoPolygonsFromDfr(baysor_poly_dt,name = 'Baysor',calc_centroids = T)
 
-####################################################################### Figure 8A #####################################################################
+############## Figure 8A ######################################################
 tx_ROI <- crop(tx_pts,zoom)
 cell_ROI <- crop(cell,zoom)
 Baysor_ROI <- crop(Baysor_gpoly,zoom)
@@ -208,7 +209,7 @@ spatInSituPlotPoints(xen_ROI,
                      polygon_line_size = 0.25,
                      coord_fix_ratio = TRUE)
 
-####################################################################### Figure 8B #####################################################################
+############## Figure 8B ######################################################
 # Preprocess
 xen_cell <- createGiottoObjectSubcellular(gpoints = list('rna' = tx_pts),
                                           gpolygons = list('cell' = cell))
@@ -341,7 +342,7 @@ my_colors = getDistinctColors(length(unique(map_cell_meta$mapped_type)))
 names(my_colors) = unique(map_cell_meta$mapped_type)
 
 
-####################################################################### Figure 8B #####################################################################
+############## Figure 8B ######################################################
 original_cell_meta = map_cell_meta[map_cell_meta$list_ID == 'cell']
 original_cell_meta$cell_ID = sub(".*-", "", original_cell_meta$cell_ID)
 xen_cell <- subsetGiotto(xen_cell,cell_ids = original_cell_meta$cell_ID)
@@ -429,7 +430,7 @@ spatInSituPlotPoints(cell_zoom,
                      plot_last = "points",
                      show_legend = FALSE,
                      save_plot = F)
-####################################################################### Figure 8C #####################################################################
+############## Figure 8C ######################################################
 dimPlot2D(join_xen,
           dim_reduction_name = "umap.projection",
           group_by = 'list_ID',
@@ -437,7 +438,7 @@ dimPlot2D(join_xen,
           cell_color = "mapped_type",point_shape = 'no_border',
           cell_color_code = my_colors)
 
-####################################################################### Figure 8D #####################################################################
+############## Figure 8D ######################################################
 cell_areas = terra::expanse(cell@spatVector)
 baysor_areas = terra::expanse(Baysor_gpoly@spatVector)
 
@@ -463,7 +464,7 @@ ggpubr::ggviolin(polygonal_areas, x = "segmentation", y = "polygonal_area", fill
     ggpubr::stat_compare_means(comparisons = list(c("Original", "Baysor")), label = "p.signif") +
     ggpubr::stat_compare_means(label.x = 1.5,label.y = 125)
 
-####################################################################### Figure 8E #####################################################################
+############## Figure 8E ######################################################
 # Calculate counts and percentages
 library(tidyverse)
 df <- as.data.frame(map_cell_meta) 
@@ -489,7 +490,7 @@ ggplot(counts, aes(x = mapped_type, y = percentage, fill = list_ID)) +
                   x = "Cell Type",
                   y = "Percentage of Segmented Cells")
 
-####################################################################### Figure 8F #####################################################################
+############## Figure 8F ######################################################
 ggplot2::ggplot(counts, aes( x = factor(list_ID),
                             y = percentage, fill = mapped_type)) +
     ggplot2::geom_bar(stat = "identity",
