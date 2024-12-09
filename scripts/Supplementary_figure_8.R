@@ -9,7 +9,7 @@
 ## This example script download orginal Xenium data to './Xenium/'
 ## Follow this tutorial to install Julia and BAYSOR-0.5.2
 ## https://www.10xgenomics.com/analysis-guides/using-baysor-to-perform-xenium-cell-segmentation
-## Unzip transcripts.csv.gz, filter out qv<20 transcripts and place transcripts.csv in the same folder as Baysor_run.sh
+## Unzip transcripts.csv.gz in './Xenium/outs/', filter out qv<20 transcripts and place transcripts.csv in the same folder as Baysor_run.sh
 ## Use the Baysor_run.sh to run Baysor and Place the Baysor output "segmentation_polygons.json" as "baysor.json" in './Segmentation_dir/'
 
 ############################# Preprocess and Load ##############################
