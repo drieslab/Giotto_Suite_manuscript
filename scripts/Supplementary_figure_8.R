@@ -117,25 +117,8 @@ gpoly_stardist_aligned <- affine(stardist_poly, affine_matrix)
 # BAYSOR
 # No need to register as it was generated using transcript coordinates
 Baysor_JSON <- paste0(Segmentation_dir, "/baysor.json")
-json_data <- jsonlite::fromJSON(Baysor_JSON)
-baysor_poly_df <- json_data$geometries
-baysor_poly_dt_list <- list()
-for (i in 1:(nrow(baysor_poly_df))) {
-    tmp_dt <- data.table::data.table()
-    tmp_dt$x <- json_data$geometries$coordinates[[i]][, , 1]
-    tmp_dt$y <- json_data$geometries$coordinates[[i]][, , 2]
-    tmp_dt$geom <- rep(i, length(json_data$geometries$coordinates[[i]][, , 1]))
-    tmp_dt$part <- rep(0, length(json_data$geometries$coordinates[[i]][, , 1]))
-    tmp_dt$hole <- rep(0, length(json_data$geometries$coordinates[[i]][, , 1]))
-    baysor_poly_dt_list[[i]] <- tmp_dt
-}
-baysor_poly_dt <- data.table::rbindlist(baysor_poly_dt_list)
-
-data.table::setnames(baysor_poly_dt,
-    old = "geom",
-    new = "poly_ID"
-)
-Baysor_gpoly <- createGiottoPolygonsFromDfr(baysor_poly_dt, name = "Baysor", calc_centroids = T)
+Baysor_gpoly <- createGiottoPolygonsFromGeoJSON(
+    Baysor_JSON, name = "Baysor", calc_centroids = TRUE)
 
 ############## Figure 8A ######################################################
 tx_ROI <- crop(tx_pts, zoom)
