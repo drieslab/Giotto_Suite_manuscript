@@ -5,12 +5,14 @@
 ##%#######################################################%##
 
 ## Download data
-## Original Xenium data can be downloaded from 10X: https://www.10xgenomics.com/products/xenium-in-situ/preview-dataset-human-breast
-## Unzip it after download and add it to the `data_dir` variable below.
+## Original Xenium data (In situ sample1, replicate 1) can be downloaded from 10X: 
+## https://www.10xgenomics.com/products/xenium-in-situ/preview-dataset-human-breast
+## 
+## After download, unzip it to "./Xenium/"
 ## 
 ## For Julia and BAYSOR-0.5.2 installation, 10x does provide some instructions:
 ## https://www.10xgenomics.com/analysis-guides/using-baysor-to-perform-xenium-cell-segmentation.
-## However we used some slightly modified steps as stated below.
+## However we used some slightly modified steps as detailed below.
 
 ############################# Segmentation Steps #############################
 library(Giotto)
@@ -50,7 +52,7 @@ set_giotto_python_path("giotto_segmentation")
 
 
 # filepaths
-data_dir <- "path/to/data" # set this to the outs folder after unzipping the Xenium data !!!
+data_dir <- "./Xenium/"
 
 results_folder <- 'scripts/FIGURE/S8/'
 Segmentation_dir <- file.path(results_folder, "Segmentation_dir")
@@ -169,7 +171,7 @@ doStardistSegmentation(
 .rs.restartR()
 # reload values due to session restart
 library(Giotto)
-data_dir <- "path/to/data" # set this to the outs folder after unzipping the Xenium data !!!
+data_dir <- "./Xenium/"
 
 results_folder <- "scripts/FIGURE/S8/"
 Segmentation_dir <- file.path(results_folder, "Segmentation_dir")
