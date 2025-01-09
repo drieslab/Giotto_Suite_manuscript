@@ -448,7 +448,7 @@ dt_sorted[, max_perc_expressed := pmax(perc_expressed_visium, perc_expressed_xen
 
 # Figure S7D ##############################################################
 rankplot <- ggplot(dt_sorted, aes(x = reorder(genes, -cor_value), y = cor_value)) + 
-    geom_bar(stat = "identity", color = 'white') +
+    geom_bar(stat = "identity", color = 'white', width = 1) +
     theme_void() +
     labs(title = "Correlation Scores Between Registered Xenium and Visium ",
          x = "Gene",
@@ -459,8 +459,8 @@ rankplot <- ggplot(dt_sorted, aes(x = reorder(genes, -cor_value), y = cor_value)
           axis.line = element_line(), 
           axis.title = element_text(), legend.position = "none") 
 
-ggsave(rankplot, filename = file.path(results_folder, "S7D_rankplot2.pdf"),
-       width = 7, height = 4)
+ggsave(rankplot, filename = file.path(results_folder, "S7D_rankplot.pdf"),
+       width = 8.5, height = 4)
 
 # Figure S7E ##############################################################
 loessplot <- ggplot(dt_sorted) + 
