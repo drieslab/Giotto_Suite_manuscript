@@ -51,3 +51,7 @@ rsconnect/
 
 # mac
 .DS_store
+
+# Data Directories
+Xenium
+Visium
