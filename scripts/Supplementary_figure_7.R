@@ -94,17 +94,26 @@ options("giotto.plot_img_max_sample" = 5e5) # revert to default sampling
 # landmarks <- readRDS("scripts/Xenium_supporting_files/landmarks.RDS") # premade landmarks
 affine_mtx <- calculateAffineMatrixFromLandmarks(landmarks[[1]], landmarks[[2]])
 
-# Figure S7A ##############################################################
 
 # import polys to show how well the registration worked
 cell_poly <- xen[[, "cell"]][[1]]
 
-plot(affine(img_vis, affine_mtx))
-plot(cell_poly, add = TRUE, border = "blue", lwd = 0.2)
-
 # align the visium data
 vis_aligned <- affine(vis, affine_mtx)
-plot(vis_aligned@spatial_info$cell, add = TRUE, col = "orange")
+aff_img_vis <- vis_aligned[["images"]][[1]]
+
+# Figure 27A ###############################################################
+plot(aff_img_vis)
+plot(cell_poly, add = TRUE, border = "blue", lwd = 0.1)
+plot(vis_aligned@spatial_info$cell, add = TRUE, col = "orange", lwd = 0.3)
+
+# Figure 2E ################################################################
+plot(aff_img_vis)
+plot(xen@images$HER2, add = TRUE, alpha = 0.7, col = getMonochromeColors("cyan"))
+plot(cell_poly, add = TRUE, border = "blue", lwd = 0.1)
+plot(vis_aligned@spatial_info$cell, add = TRUE, col = "orange", lwd = 0.1)
+
+# Figure S7A ###############################################################
 
 spatInSituPlotPoints(vis,
     polygon_bg_color = "black",
@@ -128,7 +137,51 @@ spatInSituPlotPoints(xen,
     )
 )
 
+# Figure 2F #############################################################
+options("giotto.plot_img_max_sample" = 5e6)
+spatInSituPlotPoints(xen,
+    show_image = TRUE,
+    spat_unit = "cell",
+    polygon_line_size = 0.05,
+    polygon_color = "cyan",
+    polygon_alpha = 0,
+    image_name = "HER2",
+    feats = list(rna = "ERBB2"),
+    feats_color_code = "red",
+    feat_shape_code = ".",
+    xlim = c(-300, 7822),
+    ylim = c(-100, 5580),
+    point_size = 0.01,
+    use_overlap = FALSE,
+    show_legend = FALSE,
+    save_param = list(
+        save_name = "2F_rna_prot_cell",
+        base_height = 18,
+        base_width = 26
+    )
+)
 
+spatInSituPlotPoints(xen,
+    show_image = TRUE,
+    spat_unit = "cell",
+    polygon_line_size = 0.7,
+    polygon_color = "cyan",
+    polygon_alpha = 0,
+    image_name = "HER2",
+    feats = list(rna = "ERBB2"),
+    feats_color_code = "red",
+    xlim = c(6150, 6350),
+    ylim = c(3950, 4150),
+    point_size = 2,
+    use_overlap = FALSE,
+    show_legend = FALSE,
+    save_param = list(
+        save_name = "2F_rna_prot_cell_zoom",
+        base_height = 10,
+        base_width = 10
+    )
+)
+options("giotto.plot_img_max_sample" = 5e5)
 
 # bin data (feature points and raster intensities) ##########################
 
@@ -236,12 +289,6 @@ spatFeatPlot2D(xen,
 
 # find multiscale correlations between feature types
 
-for (bin_i in seq_along(bins)) {
-    su <- objName(bins)[[bin_i]]
-    xen <- filterGiotto(xen, expression_threshold = 1, min_det_feats_per_cell = 1, )
-    xen <- normalizeGiotto(xen, spat_unit = su)
-}
-
 # Find bin spatial neighbors then create weight matrices
 for (bin_i in seq_along(bins)) {
     su <- objName(bins)[[bin_i]]
@@ -345,20 +392,15 @@ multiscale_mbv <- ggplot(morans_bv_results) +
 ggsave(multiscale_mbv, filename = file.path(results_folder, "S7C_bivariate_morans.png"),
        width = 5, height = 4)
 
-
-# create a legend for bin sizes
-hex_example_ext <- c(-500, 500, -2000, 100)
-bin_color <- getDistinctColors(7)
-bin_ctr <- XY(centroids(bins[[7]][1]))
-plot(spatShift(bins[[7]][1], dx = -bin_ctr[["x"]], dy = -5 * bin_ctr[["y"]] - 7 * 50), 
-     ext = hex_example_ext, 
-     col = bin_color[7])
-for (bin_i in 6:1) {
-    bin_ctr <- XY(centroids(bins[[bin_i]][1]))
-    plot(spatShift(bins[[bin_i]][1], dx = -bin_ctr[["x"]], dy = -5 * bin_ctr[["y"]] - bin_i * 50), 
-         add = TRUE, 
-         col = bin_color[bin_i])
-}
+# max morans scores for each comparison
+morans_bv_results[which(`MS4A1-CD20` == max(`MS4A1-CD20`)),]
+#    binarea MS4A1-CD20 ERBB2-HER2
+#      <num>      <num>      <num>
+# 1: 3547.24  0.4841736  0.6749982
+morans_bv_results[which(`ERBB2-HER2` == max(`ERBB2-HER2`)),]
+#     binarea MS4A1-CD20 ERBB2-HER2
+#       <num>      <num>      <num>
+# 1: 221.7025  0.3272328  0.7163517
 
 
 
@@ -432,19 +474,34 @@ vis_expr <- vis_expr[, shared_spots]
 cor_dt <- data.table::data.table(genes = shared_feats)
 for (i in seq_len(nrow(cor_dt))) {
     gene <- cor_dt$genes[i]
-    x = vis_expr[][gene,]
-    y = xen_expr[][gene,]
+    x <- vis_expr[][gene,]
+    y <- xen_expr[][gene,]
     cor_value <- cor(x, y)
-    cor_dt$cor_value[i] = cor_value
-    cor_dt$mean_expr_visium[i] = mean(x)
-    cor_dt$mean_expr_xenium[i] = mean(y)
+    cor_dt$cor_value[i] <- cor_value
+    cor_dt$mean_expr_visium[i] <- mean(x)
+    cor_dt$mean_expr_xenium[i] <- mean(y)
+    cor_dt$perc_expressed_visium[i] <- sum(x >= max(x) * 0.05)
+    cor_dt$perc_expressed_xenium[i] <- sum(y >= max(x) * 0.05)
 }
 
 dt_sorted <- cor_dt[order(-cor_dt$cor_value), ]
 rownames(dt_sorted) = NULL
 dt_sorted$cor_rank = 1:nrow(dt_sorted)
+dt_sorted[, perc_logfc := log2(perc_expressed_xenium / perc_expressed_visium)]
 dt_sorted[, max_perc_expressed := pmax(perc_expressed_visium, perc_expressed_xenium)]
 
+# median cor value
+cor_dt[, median(cor_value)] # 0.41433
+
+# cor vs log2(xen % spots expressed / vis % spots expressed)
+cor_perc <- ggplot(dt_sorted, aes(x = cor_value, y = perc_logfc)) +
+    xlab("pearson correlation") +
+    ylab("log2FC of % spots expressing (Xenium / Visium)") +
+    geom_point(aes(color = max_perc_expressed)) +
+    geom_hline(yintercept = 0, color = "red")
+
+ggsave(cor_perc, filename = file.path(results_folder, "cor_perc.pdf"),
+       width = 8.5, height = 4)
 
 # Figure S7D ##############################################################
 rankplot <- ggplot(dt_sorted, aes(x = reorder(genes, -cor_value), y = cor_value)) + 
@@ -487,7 +544,7 @@ ggsave(loessplot, filename = file.path(results_folder, "S7E_loess.pdf"),
        width = 5, height = 4)
 
 
-############################################# Figure 7 F and G ############################################# 
+# Figure S7F ################################################################## 
 
 highcorgene = "FASN"
 spatFeatPlot2D(gobject = xen_comp,
@@ -516,6 +573,8 @@ spatFeatPlot2D(gobject = vis_aligned,
         save_name = "S7F_FASN_vis"
     )
 )
+
+# Figure S7G ################################################################## 
 
 lowcorgene = "HDC"
 spatFeatPlot2D(xen_comp,
