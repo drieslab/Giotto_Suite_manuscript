@@ -480,8 +480,8 @@ for (i in seq_len(nrow(cor_dt))) {
     cor_dt$cor_value[i] <- cor_value
     cor_dt$mean_expr_visium[i] <- mean(x)
     cor_dt$mean_expr_xenium[i] <- mean(y)
-    cor_dt$perc_expressed_visium[i] <- sum(x >= max(x) * 0.05)
-    cor_dt$perc_expressed_xenium[i] <- sum(y >= max(x) * 0.05)
+    cor_dt$perc_expressed_visium[i] <- sum(x >= max(x) * 0.05) / length(x)
+    cor_dt$perc_expressed_xenium[i] <- sum(y >= max(y) * 0.05) / length(y)
 }
 
 dt_sorted <- cor_dt[order(-cor_dt$cor_value), ]
@@ -498,7 +498,8 @@ cor_perc <- ggplot(dt_sorted, aes(x = cor_value, y = perc_logfc)) +
     xlab("pearson correlation") +
     ylab("log2FC of % spots expressing (Xenium / Visium)") +
     geom_point(aes(color = max_perc_expressed)) +
-    geom_hline(yintercept = 0, color = "red")
+    geom_hline(yintercept = 0, color = "red") +
+    labs(color = "max % expressed")
 
 ggsave(cor_perc, filename = file.path(results_folder, "cor_perc.pdf"),
        width = 8.5, height = 4)
