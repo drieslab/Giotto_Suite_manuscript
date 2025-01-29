@@ -293,10 +293,10 @@ spatFeatPlot2D(my_giotto_object,
 )
 
 
-## cluster the top 1500 spatial genes into 20 clusters
+## cluster the top 500 spatial genes into clusters
 ext_spatial_genes <- ranktest[1:500, ]$feats
 
-# here we use existing detectSpatialCorGenes function to calculate pairwise distances between genes (but set network_smoothing=0 to use default clustering)
+# calculate pairwise distances between genes
 spat_cor_netw_DT <- detectSpatialCorFeats(my_giotto_object,
     method = "network",
     spatial_network_name = "spatial_network",
