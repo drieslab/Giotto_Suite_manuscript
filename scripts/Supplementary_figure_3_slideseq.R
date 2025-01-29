@@ -37,11 +37,9 @@ spatial_locs <- data.table::fread(file.path(data_path, "2020-12-19_Puck_201112_2
 
 spatial_locs <- spatial_locs[spatial_locs$barcodes %in% colnames(expression_matrix),]
 
-giotto_object <- createGiottoObject(
-  expression = expression_matrix,
-  spatial_locs = spatial_locs,
-  instructions = instructions
-)
+giotto_object <- createGiottoObject(expression = expression_matrix,
+                                    spatial_locs = spatial_locs,
+                                    instructions = instructions)
 
 #################################### Filtering  ################################
 
@@ -51,29 +49,76 @@ giotto_object <- filterGiotto(giotto_object,
 
 ################################ Normalization  ################################
 
-giotto_object <- normalizeGiotto(giotto_object)
+giotto_object <- normalizeGiotto(giotto_object,
+                                 scale_feats = FALSE,
+                                 scale_cells = FALSE)
 
 ################################# Statistics  ##################################
 
 giotto_object <- addStatistics(giotto_object)
 
-############################## Dimension reduction  ############################
+############################ Find spatial genes ################################
 
-giotto_object <- runPCA(giotto_object,
-                        ncp = 50)
+giotto_object <- createSpatialNetwork(gobject = giotto_object,
+                                      method = "kNN",
+                                      k = 6,
+                                      name = "spatial_network")
 
-################################### Clustering  ################################
+ranktest <- binSpect(giotto_object,
+                     bin_method = "rank",
+                     calc_hub = TRUE,
+                     hub_min_int = 5,
+                     spatial_network_name = "spatial_network")
+
+## cluster the top 500 spatial genes into clusters
+ext_spatial_genes <- ranktest[1:500, ]$feats
+
+# calculate pairwise distances between genes
+spat_cor_netw_DT <- detectSpatialCorFeats(giotto_object,
+                                          method = "network",
+                                          spatial_network_name = "spatial_network",
+                                          subset_feats = ext_spatial_genes)
+
+# identify potential spatial co-expression
+spat_cor_netw_DT <- clusterSpatialCorFeats(spat_cor_netw_DT,
+                                           name = "spat_netw_clus",
+                                           k = 10)
+
+# create metagenes/co-expression modules
+cluster_genes <- getBalancedSpatCoexpressionFeats(spat_cor_netw_DT,
+                                                  maximum = 30)
+
+giotto_object <- createMetafeats(giotto_object,
+                                 feat_clusters = cluster_genes,
+                                 name = "cluster_metagene")
+
+spatial_genes <- names(cluster_genes)
+
+################### Calculate spatial informed clusters ########################
+
+giotto_object <- runPCA(gobject = giotto_object,
+                        feats_to_use = spatial_genes,
+                        name = "custom_pca")
 
 giotto_object <- runUMAP(giotto_object,
-                         dimensions_to_use = 1:10)
+                         dim_reduction_name = "custom_pca",
+                         dimensions_to_use = 1:20,
+                         name = "custom_umap")
 
-giotto_object <- createNearestNetwork(giotto_object)
+giotto_object <- createNearestNetwork(gobject = giotto_object,
+                                      dim_reduction_name = "custom_pca",
+                                      dimensions_to_use = 1:20,
+                                      k = 30,
+                                      name = "custom_NN")
 
-giotto_object <- doLeidenCluster(giotto_object,
-                                 resolution = 1)
+giotto_object <- doLeidenCluster(gobject = giotto_object,
+                                 network_name = "custom_NN",
+                                 resolution = 0.5,
+                                 name = "custom_leiden")
 
 spatPlot2D(giotto_object,
-           cell_color = "leiden_clus",
+           show_image = FALSE,
+           cell_color = "custom_leiden",
            point_size = 1,
            background_color = "black")
 
@@ -81,9 +126,9 @@ spatPlot2D(giotto_object,
 
 sessionInfo()
 
-R version 4.4.1 (2024-06-14)
+R version 4.4.2 (2024-10-31)
 Platform: aarch64-apple-darwin20
-Running under: macOS 15.0.1
+Running under: macOS Sequoia 15.2
 
 Matrix products: default
 BLAS:   /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib
@@ -99,57 +144,58 @@ attached base packages:
   [1] stats     graphics  grDevices utils     datasets  methods   base
 
 other attached packages:
-  [1] Giotto_4.1.0      GiottoClass_0.3.5
+  [1] Giotto_4.2.0      GiottoClass_0.4.7
 
 loaded via a namespace (and not attached):
-  [1] colorRamp2_0.1.0            deldir_2.0-4
-[3] rlang_1.1.4                 magrittr_2.0.3
-[5] RcppAnnoy_0.0.22            GiottoUtils_0.1.12
-[7] matrixStats_1.4.1           compiler_4.4.1
-[9] systemfonts_1.1.0           png_0.1-8
-[11] vctrs_0.6.5                 reshape2_1.4.4
-[13] stringr_1.5.1               pkgconfig_2.0.3
-[15] SpatialExperiment_1.14.0    crayon_1.5.3
-[17] fastmap_1.2.0               backports_1.5.0
-[19] magick_2.8.5                XVector_0.44.0
-[21] labeling_0.4.3              utf8_1.2.4
-[23] UCSC.utils_1.0.0            ragg_1.3.3
-[25] purrr_1.0.2                 zlibbioc_1.50.0
-[27] beachmat_2.20.0             GenomeInfoDb_1.40.1
-[29] jsonlite_1.8.9              DelayedArray_0.30.1
-[31] BiocParallel_1.38.0         terra_1.7-78
-[33] irlba_2.3.5.1               parallel_4.4.1
-[35] R6_2.5.1                    stringi_1.8.4
-[37] RColorBrewer_1.1-3          reticulate_1.39.0
-[39] GenomicRanges_1.56.1        scattermore_1.2
-[41] Rcpp_1.0.13                 SummarizedExperiment_1.34.0
-[43] R.utils_2.12.3              IRanges_2.38.1
-[45] Matrix_1.7-0                igraph_2.0.3
-[47] tidyselect_1.2.1            rstudioapi_0.16.0
-[49] abind_1.4-8                 codetools_0.2-20
-[51] lattice_0.22-6              tibble_3.2.1
-[53] plyr_1.8.9                  Biobase_2.64.0
-[55] withr_3.0.1                 pillar_1.9.0
-[57] MatrixGenerics_1.16.0       checkmate_2.3.2
-[59] stats4_4.4.1                plotly_4.10.4
-[61] generics_0.1.3              dbscan_1.2-0
-[63] sp_2.1-4                    S4Vectors_0.42.1
+  [1] colorRamp2_0.1.0            remotes_2.5.0
+[3] rlang_1.1.5                 magrittr_2.0.3
+[5] RcppAnnoy_0.0.22            GiottoUtils_0.2.3
+[7] matrixStats_1.5.0           compiler_4.4.2
+[9] systemfonts_1.2.1           png_0.1-8
+[11] callr_3.7.6                 vctrs_0.6.5
+[13] pkgconfig_2.0.3             SpatialExperiment_1.14.0
+[15] crayon_1.5.3                fastmap_1.2.0
+[17] backports_1.5.0             magick_2.8.5
+[19] XVector_0.44.0              labeling_0.4.3
+[21] UCSC.utils_1.0.0            ps_1.8.1
+[23] ragg_1.3.3                  purrr_1.0.2
+[25] zlibbioc_1.50.0             beachmat_2.20.0
+[27] GenomeInfoDb_1.40.1         jsonlite_1.8.9
+[29] DelayedArray_0.30.1         BiocParallel_1.38.0
+[31] terra_1.8-15                irlba_2.3.5.1
+[33] parallel_4.4.2              R6_2.5.1
+[35] RColorBrewer_1.1-3          reticulate_1.40.0
+[37] GenomicRanges_1.56.1        scattermore_1.2
+[39] Rcpp_1.0.14                 SummarizedExperiment_1.34.0
+[41] R.utils_2.12.3              IRanges_2.38.1
+[43] Matrix_1.7-2                igraph_2.1.4
+[45] tidyselect_1.2.1            rstudioapi_0.17.1
+[47] abind_1.4-8                 codetools_0.2-20
+[49] curl_6.2.0                  processx_3.8.5
+[51] pkgbuild_1.4.6              lattice_0.22-6
+[53] tibble_3.2.1                Biobase_2.64.0
+[55] withr_3.0.2                 desc_1.4.3
+[57] pillar_1.10.1               MatrixGenerics_1.16.0
+[59] checkmate_2.3.2             stats4_4.4.2
+[61] plotly_4.10.4               generics_0.1.3
+[63] dbscan_1.2.2                S4Vectors_0.42.1
 [65] ggplot2_3.5.1               munsell_0.5.1
-[67] scales_1.3.0                gtools_3.9.5
-[69] glue_1.8.0                  lazyeval_0.2.2
-[71] tools_4.4.1                 GiottoVisuals_0.2.4
-[73] data.table_1.16.0           ScaledMatrix_1.12.0
-[75] cowplot_1.1.3               grid_4.4.1
-[77] tidyr_1.3.1                 colorspace_2.1-1
-[79] SingleCellExperiment_1.26.0 GenomeInfoDbData_1.2.12
-[81] BiocSingular_1.20.0         cli_3.6.3
-[83] rsvd_1.0.5                  textshaping_0.4.0
-[85] fansi_1.0.6                 S4Arrays_1.4.1
+[67] scales_1.3.0                GiottoData_0.2.14
+[69] gtools_3.9.5                glue_1.8.0
+[71] lazyeval_0.2.2              tools_4.4.2
+[73] GiottoVisuals_0.2.11        data.table_1.16.4
+[75] ScaledMatrix_1.12.0         cowplot_1.1.3
+[77] grid_4.4.2                  tidyr_1.3.1
+[79] colorspace_2.1-1            SingleCellExperiment_1.26.0
+[81] GenomeInfoDbData_1.2.12     BiocSingular_1.20.0
+[83] cli_3.6.3                   rsvd_1.0.5
+[85] textshaping_1.0.0           S4Arrays_1.4.1
 [87] viridisLite_0.4.2           dplyr_1.1.4
-[89] uwot_0.2.2                  gtable_0.3.5
+[89] uwot_0.2.2                  gtable_0.3.6
 [91] R.methodsS3_1.8.2           digest_0.6.37
 [93] BiocGenerics_0.50.0         SparseArray_1.4.8
-[95] ggrepel_0.9.6               rjson_0.2.23
-[97] htmlwidgets_1.6.4           farver_2.1.2
-[99] htmltools_0.5.8.1           R.oo_1.26.0
+[95] ggrepel_0.9.6               farver_2.1.2
+[97] rjson_0.2.23                htmlwidgets_1.6.4
+[99] htmltools_0.5.8.1           R.oo_1.27.0
 [101] lifecycle_1.0.4             httr_1.4.7
+
