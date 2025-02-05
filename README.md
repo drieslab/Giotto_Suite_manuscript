@@ -26,7 +26,10 @@ The following spatial datasets were used in this manuscript:
 - Vizgen MERSCOPE/MERFISH FFPE breast cancer: https://info.vizgen.com/ffpe-showcase    
 - 10X Genomics Xenium human breast cancer: https://www.10xgenomics.com/products/xenium-in-situ/preview-dataset-human-breast     
 - 10X Genomics multi-modal Visium CytAssist Human Tonsil: https://www.10xgenomics.com/resources/datasets/gene-protein-expression-library-of-human-tonsil-cytassist-ffpe-2-standard    
-- 10X Genomics Visium Mouse Brain Section (Coronal): https://support.10xgenomics.com/spatial-gene-expression/datasets/1.1.0/V1_Adult_Mouse_Brain     
+- 10X Genomics Visium Mouse Brain Section (Coronal): https://support.10xgenomics.com/spatial-gene-expression/datasets/1.1.0/V1_Adult_Mouse_Brain
+- 10X Genomics Visium HD Human Colorectal Cancer: https://www.10xgenomics.com/datasets/visium-hd-cytassist-gene-expression-libraries-of-human-crc.
+- OpenST adult mouse hippocampus dataset: https://rajewsky-lab.github.io/openst/latest/examples/datasets/.
+- Slide-seq mouse brain: https://data.nemoarchive.org/biccn/grant/rf1_macosko/macosko/spatial_transcriptome/cellgroup/Slide-seq/mouse/.
 - Stereo-seq Mouse Embryo E16.5_E2S6 bin1 matrix (i.e. *_GEM_bin1.tsv.gz): (https://db.cngb.org/stomics/mosta/download/)    
 - Imaging Mass Cytometry Intensity images of human lymph node FFPE: ([Bost et al. 2023](https://doi.org/10.1038/s41592-022-01692-z)) https://data.mendeley.com/datasets/ncfgz5xxyb/1    
 - Single Cell Mouse Brain Dataset ([Manno et al. 2021](https://doi.org/10.1038/s41586-021-03775-x])): http://mousebrain.org/development/downloads.html     
