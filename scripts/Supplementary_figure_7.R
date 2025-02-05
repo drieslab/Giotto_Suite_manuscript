@@ -99,7 +99,7 @@ affine_mtx <- calculateAffineMatrixFromLandmarks(landmarks[[1]], landmarks[[2]])
 cell_poly <- xen[[, "cell"]][[1]]
 
 # align the visium data
-vis_aligned <- affine(vis, affine_mtx)
+vis_aligned <- affine(vis, affine_mtx, pre_multiply = TRUE)
 aff_img_vis <- vis_aligned[["images"]][[1]]
 
 # Figure 27A ###############################################################
