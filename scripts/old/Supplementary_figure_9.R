@@ -1,6 +1,6 @@
 ## %######################################################%##
 #                                                          #
-####               Supplementary figure 6               ####
+####               Supplementary figure 9               ####
 #                                                          #
 ## %######################################################%##
 
@@ -11,7 +11,7 @@ my_seed_num <- 315
 set.seed(my_seed_num)
 
 # create instructions
-results_folder <- "results/supplementary_figure_6/"
+results_folder <- "results"
 
 dir.create(results_folder, showWarnings = FALSE)
 python_path <- NULL
@@ -448,7 +448,7 @@ spatInSituPlotPoints(
     polygon_alpha = 1,
     background_color = "black",
     save_param = list(
-        save_name = "S6b1_spat_cell",
+        save_name = "S9B1_spat_cell",
         save_format = "svg"
     )
 )
@@ -462,7 +462,7 @@ plotUMAP(
     point_shape = "no_border",
     show_center_label = FALSE,
     save_param = list(
-        save_name = "S6b2_umap_cell",
+        save_name = "S9B2_umap_cell",
         save_format = "svg"
     )
 )
@@ -517,7 +517,7 @@ spatInSituPlotPoints(
     polygon_alpha = 1,
     background_color = "black",
     save_param = list(
-        save_name = "S6c1_spat_smallcell",
+        save_name = "S9C1_spat_smallcell",
         save_format = "svg"
     )
 )
@@ -532,7 +532,7 @@ plotUMAP(
     point_shape = "no_border",
     show_center_label = FALSE,
     save_param = list(
-        save_name = "S6c2_umap_smallcell",
+        save_name = "S9C2_umap_smallcell",
         save_format = "svg"
     )
 )
@@ -629,7 +629,7 @@ spatInSituPlotPoints(
     polygon_alpha = 1,
     background_color = "black",
     save_param = list(
-        save_name = "S6d_cell_switch_nb",
+        save_name = "S9D_cell_switch_nb",
         save_format = "svg"
     )
 )
@@ -683,7 +683,7 @@ pl <- pl + theme_classic()
 pl
 
 ggplot2::ggsave(
-    filename = file.path(results_folder, "S6e1_barplot_switches.svg"),
+    filename = paste0(results_folder, "/S9E1_barplot_switches.svg"),
     plot = pl,
     device = "svg",
     width = 3,
@@ -700,7 +700,7 @@ pl <- pl + theme_classic()
 pl
 
 ggplot2::ggsave(
-    filename = file.path(results_folder, "S6e2_barplot_nbs.svg"),
+    filename = paste0(results_folder, "/S9E2_barplot_nbs.svg"),
     plot = pl,
     device = "svg",
     width = 3,
@@ -738,7 +738,7 @@ spatInSituPlotPoints(
     polygon_alpha = 1,
     background_color = "black",
     save_param = list(
-        save_name = "S6c3_mini_spat_smallcell",
+        save_name = "S9C3_mini_spat_smallcell",
         save_format = "svg"
     )
 )
@@ -816,7 +816,7 @@ spatInSituPlotPoints(
     polygon_alpha = 1,
     background_color = "black",
     save_param = list(
-        save_name = "S6b3_mini_spat_cell",
+        save_name = "S9B3_mini_spat_cell",
         save_format = "svg"
     )
 )
@@ -891,7 +891,7 @@ pl
 
 
 ggplot2::ggsave(
-    filename = file.path(results_folder, "S6f_sankeyplot.svg"),
+    filename = paste0(results_folder, "./S9F_sankeyplot.svg"),
     plot = pl,
     device = "svg",
     width = 8,

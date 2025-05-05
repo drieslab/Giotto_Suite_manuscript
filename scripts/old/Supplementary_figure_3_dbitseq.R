@@ -6,9 +6,7 @@
 
 
 ############################## Download dataset  ###############################
-## The mouse embryo E10.5 dataset was created by
-## [Liu, et al 2020](https://www.sciencedirect.com/science/article/pii/S0092867420313908?via%3Dihub)
-## and downloaded from https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE137986
+## The mouse embryo E10.5 dataset was created by [Liu, et al 2020](https://www.sciencedirect.com/science/article/pii/S0092867420313908?via%3Dihub) and downloaded from https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE137986
 
 ################################# Load data  ###################################
 
@@ -42,7 +40,7 @@ spatial_coords$y <- as.numeric(spatial_coords$y) * -1
 
 library(Giotto)
 
-save_dir <- "results/supplementary_figure_3_dbitseq/"
+save_dir <- "results"
 
 instructions <- createGiottoInstructions(
   save_dir = save_dir,

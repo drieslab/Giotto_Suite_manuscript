@@ -15,7 +15,7 @@ library(Giotto)
 
 instructions <- createGiottoInstructions(
     save_plot = TRUE,
-    save_dir = "results/supplementary_figure_3_citeseq",
+    save_dir = "results",
     show_plot = TRUE
 )
 

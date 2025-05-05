@@ -8,7 +8,7 @@
 ## Download the mouse brain dataset deposited in the NeMO database
 ## by the Macosko lab under the grant rf1_macosko
 
-data_path <- "data/slideseq"
+data_path <- "data"
 
 ## Get the expression data
 download.file(url = "https://data.nemoarchive.org/biccn/grant/rf1_macosko/macosko/spatial_transcriptome/cellgroup/Slide-seq/mouse/processed/counts/2020-12-19_Puck_201112_26.matched.digital_expression.mex.tar.gz",
@@ -26,7 +26,7 @@ untar(tarfile = file.path(data_path, "2020-12-19_Puck_201112_26.matched.digital_
 library(Giotto)
 
 instructions <- createGiottoInstructions(save_plot = TRUE,
-                                         save_dir = "results/supplementary_figure_3_slideseq",
+                                         save_dir = "results",
                                          show_plot = FALSE,
                                          return_plot = FALSE,
                                          python_path = NULL)

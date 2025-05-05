@@ -33,7 +33,7 @@ viv10 <- c(
 ############################ Set seed, Initialize ###############################
 
 # set results folder for plot saving
-results_folder <- "results/supplementary_figure_3_nanostring/"
+results_folder <- "results/"
 my_seed_num <- 315
 set.seed(my_seed_num)
 python_path <- NULL # alternatively, "/local/python/path/python" if desired.
@@ -47,7 +47,7 @@ instructions <- createGiottoInstructions(
 )
 
 ## provide path to nanostring folder
-data_path <- "data/Lung12/Lung12-Flat_files_and_images/"
+data_path <- "Lung12/Lung12-Flat_files_and_images/"
 
 ########################### Create Giotto Object ###############################
 

@@ -13,11 +13,11 @@
 library(Giotto)
 
 # Set path to folder containing spatial genomics data
-data_path <- "data/spatialgenomics/"
+data_path <- "data/"
 
-dapi <- file.path(data_path, "SG_MouseKidneyDataRelease_DAPI_section1.ome.tiff")
-mask <- file.path(data_path, "SG_MouseKidneyDataRelease_CellMask_section1.tiff")
-tx <- file.path(data_path, "SG_MouseKidneyDataRelease_TranscriptCoordinates_section1.csv")
+dapi <- paste0(data_path, "SG_MouseKidneyDataRelease_DAPI_section1.ome.tiff")
+mask <- paste0(data_path, "SG_MouseKidneyDataRelease_CellMask_section1.tiff")
+tx <- paste0(data_path, "SG_MouseKidneyDataRelease_TranscriptCoordinates_section1.csv")
 
 
 # Create giotto polygons
@@ -34,18 +34,10 @@ tx <- data.table::fread(tx)
 gpoints <- createGiottoPoints(tx)
 
 # Create giotto object
-instructions <- createGiottoInstructions(
-  save_plot = TRUE,
-  save_dir = "results/supplementary_figure_3_spatialgenomics",
-  show_plot = TRUE
-)
-
 sg <- createGiottoObjectSubcellular(
   gpoints = list("rna" = gpoints),
-  gpolygons = list("cell" = gpoly),
-  instructions = instructions
+  gpolygons = list("cell" = gpoly)
 )
-
 
 #################################### Aggregate  ################################
 

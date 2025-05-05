@@ -9,30 +9,32 @@
 ## Human Colorectal Cancer (FFPE) from the 10X genomics website
 ## https://www.10xgenomics.com/datasets/visium-hd-cytassist-gene-expression-libraries-of-human-crc
 
-dir.create("data/visiumhd")
+dir.create("data")
 
 ## Get the data
 download.file(url = "https://cf.10xgenomics.com/samples/spatial-exp/3.0.0/Visium_HD_Human_Colon_Cancer/Visium_HD_Human_Colon_Cancer_spatial.tar.gz",
-              destfile = file.path("data/visiumhd", "Visium_HD_Human_Colon_Cancer_spatial.tar.gz"))
+              destfile = file.path("data", "Visium_HD_Human_Colon_Cancer_spatial.tar.gz"))
 
 download.file(url = "https://cf.10xgenomics.com/samples/spatial-exp/3.0.0/Visium_HD_Human_Colon_Cancer/Visium_HD_Human_Colon_Cancer_binned_outputs.tar.gz",
-              destfile = file.path("data/visiumhd", "Visium_HD_Human_Colon_Cancer_binned_outputs.tar.gz"))
+              destfile = file.path("data", "Visium_HD_Human_Colon_Cancer_binned_outputs.tar.gz"))
 
 ## Untar the file
-untar(tarfile = file.path("data/visiumhd", "Visium_HD_Human_Colon_Cancer_spatial.tar.gz"),
-      exdir = "data/visiumhd")
+untar(tarfile = file.path("data", "Visium_HD_Human_Colon_Cancer_spatial.tar.gz"),
+      exdir = "data")
 
-untar(tarfile = file.path("data/visiumhd", "Visium_HD_Human_Colon_Cancer_binned_outputs.tar.gz"),
-      exdir = "data/visiumhd")
+untar(tarfile = file.path("data", "Visium_HD_Human_Colon_Cancer_binned_outputs.tar.gz"),
+      exdir = "data")
 
 ############################## Create the object  ##############################
 
 library(Giotto)
 
 # Set instructions
-results_folder <- "results/supplementary_figure_3_visiumhd/"
+results_folder <- "results/"
+
 python_path <- NULL
-data_path <- "data/visiumhd/binned_outputs/square_016um/"
+
+data_path <- "data/binned_outputs/square_016um/"
 
 ## create instructions
 instructions <- createGiottoInstructions(save_dir = results_folder,

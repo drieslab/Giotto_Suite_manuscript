@@ -29,7 +29,7 @@ library(scattermore)
 ############################## Set instructions  ###############################
 python_path <- NULL
 
-results_folder <- "results/supplementary_figure_3_seqscope/"
+results_folder <- "results"
 
 instructions <- createGiottoInstructions(
     save_dir = results_folder,
@@ -38,19 +38,18 @@ instructions <- createGiottoInstructions(
     python_path = python_path
 )
 
-# place all the data file in this location
-data_path <- "data/seqscope/"
+dataDir <- "data/raw/"
 
 ############################## Create the object  ##############################
 
 # read raw data
 
 ## expression matrix
-expr_matrix <- Giotto::get10Xmatrix(path_to_data = data_path,
+expr_matrix <- Giotto::get10Xmatrix(path_to_data = dataDir,
                                     gene_column_index = 2)
 
 ## Spatial coordinates
-spatial_coords <- data.table::fread(file.path(data_path, "spatialcoordinates.txt"))
+spatial_coords <- data.table::fread("data/spatialcoordinates.txt")
 colnames(spatial_coords) <- c("HDMI", "Lane", "Tile", "X", "Y")
 
 # Subset expression and spatial info by tile
@@ -84,7 +83,7 @@ pl <- ggplot() +
 pl
 
 ### Use Segmentation from Qupath
-geojson_path <- file.path(data_path, "2104_seg.geojson")
+geojson_path <- "data/2104_seg.geojson"
 test <- terra::vect(geojson_path)
 
 cellpolygons <- test[test$objectType != "annotation"]
