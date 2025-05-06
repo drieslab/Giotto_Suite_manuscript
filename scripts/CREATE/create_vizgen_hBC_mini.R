@@ -116,7 +116,7 @@ nuc_poly@spatVector$objectType <- NULL
 hBC_vizproxy <- qs::qread(file.path(H5TP_dir, "vizH5Proxy.qs"))
 hBC_vizproxy <- H5TPmigratePaths(hBC_vizproxy, new_dir = poly_dir)
 
-
+# may have to set a higher value for options("future.globals.maxSize") such as 1e10
 cell_sv <- H5TPqueryPolys(hBC_vizproxy, gimg_list[[1]]@raster_object, crop_ext)
 cell_poly <- giottoPolygon(
   spatVector = cell_sv,
