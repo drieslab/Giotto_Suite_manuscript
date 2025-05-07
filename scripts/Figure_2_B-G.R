@@ -22,7 +22,7 @@ setwd("PATH TO Giotto_Suite_manuscript REPO")
 python_path <- NULL
 g = loadGiotto(path_to_folder = 'scripts/CREATE/OUTS/vizgen_ffpe_BC_mini/',
                python_path = python_path)
-instructions(g, 'save_dir') = 'scripts/FIGURE/S4/'
+instructions(g, 'save_dir') = 'scripts/FIGURE/F2/'
 instructions(g, 'show_plot') = TRUE
 instructions(g, 'return_plot') = FALSE
 instructions(g, 'save_plot') = TRUE
