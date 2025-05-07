@@ -111,6 +111,7 @@ img_xen <- xen[[, "dapi"]][[1]]
 # increase image sampling to help with manual alignment
 options("giotto.plot_img_max_sample" = 5e6)
 
+# Figure S5a ################################################################
 # Select landmarks and calculate affine transform
 landmarks <- interactiveLandmarkSelection(img_vis, img_xen) # you can skip this and load the premade
 #landmarks <- readRDS("scripts/Xenium_supporting_files/landmarks.RDS") # premade landmarks
@@ -126,15 +127,41 @@ cell_poly <- xen[[, "cell"]][[1]]
 vis_aligned <- affine(vis, affine_mtx, pre_multiply = TRUE)
 aff_img_vis <- vis_aligned[["images"]][[1]]
 
-# Figure 3b ################################################################
+# Figure S5b right #########################################################
 plot(aff_img_vis)
 plot(cell_poly, add = TRUE, border = "blue", lwd = 0.1)
 plot(vis_aligned@spatial_info$cell, add = TRUE, col = "orange", lwd = 0.3)
+
+# Figure 3b ##############################################################
 
 plot(aff_img_vis)
 plot(xen@images$HER2, add = TRUE, alpha = 0.7, col = getMonochromeColors("cyan"))
 plot(cell_poly, add = TRUE, border = "blue", lwd = 0.1)
 plot(vis_aligned@spatial_info$cell, add = TRUE, col = "orange", lwd = 0.1)
+
+# Figure S5b left,middle ###################################################
+
+spatInSituPlotPoints(vis,
+    polygon_bg_color = "black",
+    polygon_line_size = 0,
+    show_image = TRUE,
+    xlim = c(0, 19510),
+    ylim = c(-21570, 0),
+    save_param = list(
+        save_name = "S5b_visium"
+    )
+)
+
+spatInSituPlotPoints(xen,
+    polygon_alpha = 0,
+    polygon_color = "blue",
+    polygon_line_size = 0.1,
+    show_image = TRUE,
+    image_name = "dapi",
+    save_param = list(
+        save_name = "S5b_xenium"
+    )
+)
 
 # Figure 3c #############################################################
 options("giotto.plot_img_max_sample" = 5e6)
