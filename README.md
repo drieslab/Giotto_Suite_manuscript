@@ -6,6 +6,15 @@ The [scripts](scripts/) repository contains all the code used to generate the fi
 - Giotto Suite [repo](http://giottosuite.com)
 - Giotto Suite [preprint](https://www.biorxiv.org/content/10.1101/2023.11.26.568752v1)
 
+## Giotto Module Versions Used:
+- {Giotto} [v4.2.1](https://github.com/drieslab/Giotto/tree/v4.2.1)
+- {GiottoVisuals} [v0.2.12](https://github.com/drieslab/GiottoVisuals/tree/v0.2.12)
+- {GiottoClass} [v0.4.7](https://github.com/drieslab/GiottoClass/tree/v0.4.7)
+- {GiottoUtils} [v0.2.4](https://github.com/drieslab/GiottoUtils/tree/v0.2.4)
+- {GiottoDB} [v0.0.0.0001](https://github.com/drieslab/GiottoDB/tree/v0.0.0.0001)
+
+Archive branches for these modules can be found by clicking the version numbers above.
+
 ## folder structure
 - [scripts](scripts/) - main directory containing reproducible scripts and associated subdirectories
   - [CREATE](scripts/CREATE/) - intermediate and additional files
